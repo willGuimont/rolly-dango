@@ -1,14 +1,16 @@
 import std/[os, strformat]
-# Package
 
+# Package
 version       = "0.1.0"
-author        = "Danil Yarantsev (Yardanico)"
-description   = "A WASM-4 cartridge example in Nim"
-license       = "ISC"
+author        = "William Guimont-Martin (willGuimont) and Samuel Rouleau (samX500)"
+description   = "Rolly Dango, an isometric rolling puzzle made with [WASM-4]"
+license       = "MIT"
 srcDir        = "src"
 
 # Dependencies
+# requires ...
 
+# Build
 let outFile = "build" / "cart.wasm"
 requires "nim >= 1.4.0"
 
@@ -21,6 +23,6 @@ task rel, "Build the cartridge with all optimizations":
 after rel:
   let exe = findExe("wasm-opt")
   if exe != "":
-    exec(&"wasm-opt -Oz --zero-filled-memory --strip-producers {outFile} -o {outFile}")
+    exec(&"wasm-opt -Oz --strip-producers {outFile} -o {outFile}")
   else:
     echo "Tip: wasm-opt was not found. Install it from binaryen for smaller builds!"
