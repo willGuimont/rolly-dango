@@ -1,6 +1,8 @@
 # wasm4-game-jam-2022
 
-Rolly Dango, an isometric rolling puzzle made with [WASM-4](https://wasm4.org/)
+Rolly Dango, an isometric rolling puzzle made with [WASM-4](https://wasm4.org/).
+
+[Try the game here!](https://willguimont.github.io/wasm4-game-jam-2022/).
 
 ## Game plan
 
@@ -34,6 +36,12 @@ Optionally, you can install binaryen to optimize further the binary size.
 nimble dbg
 # Release mode
 nimble rel
+```
+
+## Deploy to GitHub-Pages
+
+```bash
+./deploy.sh
 ```
 
 ## Running the cartridge
