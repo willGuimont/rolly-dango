@@ -14,6 +14,9 @@ srcDir        = "src"
 let outFile = "build" / "cart.wasm"
 requires "nim >= 1.4.0"
 
+task test, "Runs the test suite":
+  exec "nim c -r tests/tester"
+
 task dbg, "Build the cartridge in debug mode":
   exec &"nim c -o:{outFile} src/cart.nim"
 
