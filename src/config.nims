@@ -9,7 +9,7 @@ switch("cc", "clang")
 
 # ARC is much more embedded-friendly
 switch("gc", "arc")
-# Treats defects as errors, results in smaller binary size 
+# Treats defects as errors, results in smaller binary size
 switch("panics", "on")
 
 # Use the common ANSI C target

@@ -93,9 +93,9 @@ proc tracef*(str: cstring) {.varargs.}
 
 import std/macros
 
-macro exportWasm*(def: untyped): untyped = 
+macro exportWasm*(def: untyped): untyped =
   result = def
-  result[^3] = nnkPragma.newTree( 
+  result[^3] = nnkPragma.newTree(
     ident("exportc"),
     nnkExprColonExpr.newTree(
       ident("codegenDecl"),

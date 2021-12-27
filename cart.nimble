@@ -1,24 +1,33 @@
 import std/[os, strformat]
 
 # Package
-version       = "0.1.0"
-author        = "William Guimont-Martin (willGuimont) and Samuel Rouleau (samX500)"
-description   = "Rolly Dango, an isometric rolling puzzle made with [WASM-4]"
-license       = "MIT"
-srcDir        = "src"
+version = "0.1.0"
+author = "William Guimont-Martin (willGuimont) and Samuel Rouleau (samX500)"
+description = "Rolly Dango, an isometric rolling puzzle made with [WASM-4]"
+license = "MIT"
+srcDir = "src"
 
 # Dependencies
-# requires ...
+# requires ""
 
 # Build
 let outFile = "build" / "cart.wasm"
 requires "nim >= 1.4.0"
 
-task test, "Runs the test suite":
-  exec "nim c -r tests/tester"
+# Tests
+before test:
+  exec "nimformat"
+
+# Debug
+before dbg:
+  exec "nimformat"
 
 task dbg, "Build the cartridge in debug mode":
   exec &"nim c -o:{outFile} src/cart.nim"
+
+# Release
+before rel:
+  exec "nimformat"
 
 task rel, "Build the cartridge with all optimizations":
   exec &"nim c -d:danger -o:{outFile} src/cart.nim"
