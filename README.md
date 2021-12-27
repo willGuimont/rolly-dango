@@ -38,6 +38,12 @@ nimble dbg
 nimble rel
 ```
 
+## Run the tests
+
+```bash
+nimble test
+```
+
 ## Deploy to GitHub-Pages
 
 ```bash
