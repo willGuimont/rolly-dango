@@ -1,7 +1,7 @@
 import unittest
 import std/macros
 import std/options
-import cart/pubsub/pubsub
+import cart/events/pubsub
 
 macro makeMockedSub(eventType: untyped, name: untyped) =
   let wasCalledWithName = ident($name & "WasCalledWith")
