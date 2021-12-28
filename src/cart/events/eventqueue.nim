@@ -16,10 +16,10 @@ proc popMessage*[T](queue: EventQueue[T]): Option[T] =
   else:
     result = none(T)
 
-proc createTopic*[T](): Topic[T] =
+proc newTopic*[T](): Topic[T] =
   result = Topic[T]()
 
-proc createEventQueue*[T](): EventQueue[T] =
+proc newEventQueue*[T](): EventQueue[T] =
   result = new(EventQueue[T])
 
 proc followTopic*[T](eventQueue: EventQueue[T], topic: var Topic[T]) =
