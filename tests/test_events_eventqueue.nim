@@ -27,6 +27,20 @@ suite "eventqueue":
     check len(queue.messages) == 1
     check aMessage in queue.messages
 
+  test "can send message to multiple queues":
+    var topic = createTopic[MessageType]()
+    var queue1 = createEventQueue[MessageType]()
+    var queue2 = createEventQueue[MessageType]()
+    queue1.followTopic(topic)
+    queue2.followTopic(topic)
+
+    topic.sendMessage(aMessage)
+
+    check len(queue1.messages) == 1
+    check aMessage in queue1.messages
+    check len(queue2.messages) == 1
+    check aMessage in queue2.messages
+
   test "can send multiple messages":
     var topic = createTopic[MessageType]()
     var queue = createEventQueue[MessageType]()
