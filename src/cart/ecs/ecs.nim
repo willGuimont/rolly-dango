@@ -44,7 +44,7 @@ proc markToDestroy*(reg: Registry, entity: Entity) =
 
 proc destroyMarkedEntities*(reg: Registry) =
   for e in reg.toDestroyEntities:
-    destroyEntity(reg, e)
+    reg.destroyEntity(e)
 
 proc addComponent*[T](reg: Registry, entity: Entity, component: T) =
   let componentHash = ($T).hash()
@@ -78,15 +78,17 @@ proc hasComponent*[T](reg: Registry, entity: Entity): bool =
 
 macro hasAllComponents*(reg: Registry, entity: Entity, componentTypes: varargs[
     untyped]): untyped =
-  ## Generates an expression of the form `true and hasComponent[t1](reg, entity) and ... and hasComponent[tn](reg, entity)`
+  ## Generates an expression of the form `true and reg.hasComponent[:t1](entity) and ... and reg.hasComponent[:tn](entity)`
   ## The components should be ordered from more general (more numerous), to the more specific
   result = newLit(true)
   for c in componentTypes:
     let hasComp = quote do:
-      hasComponent[`c`](`reg`, `entity`)
+      `reg`.hasComponent[:`c`](`entity`)
     result = infix(result, "and", hasComp)
 
 macro entitiesWith*(reg: Registry, componentTypes: varargs[untyped]): untyped =
   result = quote do:
     filter(`reg`.allEntities, proc(
-        e: Entity): bool = hasAllComponents(`reg`, e, `componentTypes`))
+        e: Entity): bool = `reg`.hasAllComponents(e, `componentTypes`))
+
+# TODO add macro to return multiple components directly

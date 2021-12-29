@@ -16,18 +16,18 @@ requires "nim >= 1.4.0"
 
 # Tests
 before test:
-  exec "nimformat"
+  exec "./nimformat.sh"
 
 # Debug
 before dbg:
-  exec "nimformat"
+  exec "./nimformat.sh"
 
 task dbg, "Build the cartridge in debug mode":
   exec &"nim c -o:{outFile} src/cart.nim"
 
 # Release
 before rel:
-  exec "nimformat"
+  exec "./nimformat.sh"
 
 task rel, "Build the cartridge with all optimizations":
   exec &"nim c -d:danger -o:{outFile} src/cart.nim"

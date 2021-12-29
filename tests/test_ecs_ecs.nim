@@ -16,8 +16,8 @@ suite "ecs":
 
     reg.addComponent(entity, component)
 
-    check hasComponent[TestComponent](reg, entity)
-    check getComponent[TestComponent](reg, entity) == component
+    check reg.hasComponent[:TestComponent](entity)
+    check reg.getComponent[:TestComponent](entity) == component
 
   test "can remove component from entity":
     var reg = newRegistry()
@@ -25,9 +25,9 @@ suite "ecs":
     var component = TestComponent(x: 1, y: 2)
     reg.addComponent(entity, component)
 
-    removeComponent[TestComponent](reg, entity)
+    reg.removeComponent[:TestComponent](entity)
 
-    check not hasComponent[TestComponent](reg, entity)
+    check not reg.hasComponent[:TestComponent](entity)
 
   test "can remove entity":
     var reg = newRegistry()
@@ -40,7 +40,7 @@ suite "ecs":
     check not reg.isEntityValid(entity)
     expect ValueError:
       # also deletes the components
-      discard getComponent[TestComponent](reg, entity)
+      discard reg.getComponent[:TestComponent](entity)
 
   test "can delete marked entities":
     var reg = newRegistry()
@@ -63,11 +63,11 @@ suite "ecs":
     reg.addComponent(entity1, component2)
     reg.addComponent(entity2, component2)
 
-    check hasAllComponents(reg, entity1)
-    check hasAllComponents(reg, entity1, TestComponent)
-    check hasAllComponents(reg, entity1, TestComponent, OtherComponent)
-    check not hasAllComponents(reg, entity2, TestComponent)
-    check not hasAllComponents(reg, entity2, TestComponent, OtherComponent)
+    check reg.hasAllComponents(entity1)
+    check reg.hasAllComponents(entity1, TestComponent)
+    check reg.hasAllComponents(entity1, TestComponent, OtherComponent)
+    check not reg.hasAllComponents(entity2, TestComponent)
+    check not reg.hasAllComponents(entity2, TestComponent, OtherComponent)
 
   test "can iterate on entities with components":
     var reg = newRegistry()
@@ -81,7 +81,7 @@ suite "ecs":
     reg.addComponent(entity2, component2)
     reg.addComponent(entity3, component1)
 
-    let foundEntities = entitiesWith(reg, TestComponent)
+    let foundEntities = reg.entitiesWith(TestComponent)
 
     check entity1 in foundEntities
     check not (entity2 in foundEntities)

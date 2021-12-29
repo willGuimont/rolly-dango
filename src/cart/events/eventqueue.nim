@@ -24,7 +24,7 @@ proc newEventQueue*[T](): EventQueue[T] =
 
 proc followTopic*[T](eventQueue: EventQueue[T], topic: var Topic[T]) =
   proc queueMessage(event: T) =
-    eventQueue[].queue.add(event)
+    eventQueue.queue.add(event)
   topic.addSubscriber(queueMessage)
 
 proc sendMessage*[T](topic: Topic[T], message: T) =

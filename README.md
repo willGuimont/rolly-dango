@@ -27,8 +27,6 @@ Phase 3:
 
 Install [WASM-4](https://wasm4.org/docs/getting-started/setup).
 
-Install [nimformat](https://pypi.org/project/nimformat/) for code formatting.
-
 Optionally, you can install binaryen to optimize further the binary size.
 
 ## Build cartridge
