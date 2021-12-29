@@ -34,6 +34,11 @@ proc destroyEntity*(reg: Registry, entity: Entity) =
   for tablesKey in reg.components.keys:
     reg.components[tablesKey].del(entity)
 
+proc allEntities*(reg: Registry): seq[Entity] =
+  result = @[]
+  for e in reg.validEntities:
+    result.add(e)
+
 proc markToDestroy*(reg: Registry, entity: Entity) =
   reg.toDestroyEntities.incl(entity)
 
@@ -71,7 +76,7 @@ proc hasComponent*[T](reg: Registry, entity: Entity): bool =
     return false
   return reg.components[componentHash].hasKey(entity)
 
-macro hasAllComponents*(reg: untyped, entity: untyped, componentTypes: varargs[
+macro hasAllComponents*(reg: Registry, entity: Entity, componentTypes: varargs[
     untyped]): untyped =
   ## Generates an expression of the form `true and hasComponent[t1](reg, entity) and ... and hasComponent[tn](reg, entity)`
   ## The components should be ordered from more general (more numerous), to the more specific
@@ -81,5 +86,7 @@ macro hasAllComponents*(reg: untyped, entity: untyped, componentTypes: varargs[
       hasComponent[`c`](`reg`, `entity`)
     result = infix(result, "and", hasComp)
 
-# TODO iterator that
-# iterator entitiesWith[varargs[untyped]]
+macro entitiesWith*(reg: Registry, componentTypes: varargs[untyped]): untyped =
+  result = quote do:
+    filter(`reg`.allEntities, proc(
+        e: Entity): bool = hasAllComponents(`reg`, e, `componentTypes`))
