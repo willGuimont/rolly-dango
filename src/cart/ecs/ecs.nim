@@ -71,18 +71,15 @@ proc hasComponent*[T](reg: Registry, entity: Entity): bool =
     return false
   return reg.components[componentHash].hasKey(entity)
 
+macro hasAllComponents*(reg: untyped, entity: untyped, componentTypes: varargs[
+    untyped]): untyped =
+  ## Generates an expression of the form `true and hasComponent[t1](reg, entity) and ... and hasComponent[tn](reg, entity)`
+  ## The components should be ordered from more general (more numerous), to the more specific
+  result = newLit(true)
+  for c in componentTypes:
+    let hasComp = quote do:
+      hasComponent[`c`](`reg`, `entity`)
+    result = infix(result, "and", hasComp)
+
 # TODO iterator that
 # iterator entitiesWith[varargs[untyped]]
-macro entitiesWith*(forLoop: ForLoopStmt): auto =
-  echo "\nCode before:\n", toStrLit(forLoop).strVal
-  result = newTree(nnkStmtList)
-  let
-    forVar = forLoop[0]
-    reg = forLoop[1][1]
-    types = forLoop[1][2]
-    forBody = forLoop[2]
-  for t in types:
-    let forBodyCopy = newBlockStmt(copyNimTree(forBody))
-    result.add()
-
-  echo "\nCode after:", toStrLit(result).strVal, "\n"

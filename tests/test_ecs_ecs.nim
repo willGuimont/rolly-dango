@@ -6,13 +6,15 @@ suite "ecs":
     TestComponent = ref object of Component
       x: int
       y: int
+    OtherComponent = ref object of Component
+      z: int
 
   test "can add component to entity":
     var reg = newRegistry()
     var entity = reg.newEntity()
     var component = TestComponent(x: 1, y: 2)
 
-    addComponent[TestComponent](reg, entity, component)
+    addComponent(reg, entity, component)
 
     check hasComponent[TestComponent](reg, entity)
     check getComponent[TestComponent](reg, entity) == component
@@ -21,7 +23,7 @@ suite "ecs":
     var reg = newRegistry()
     var entity = reg.newEntity()
     var component = TestComponent(x: 1, y: 2)
-    addComponent[TestComponent](reg, entity, component)
+    addComponent(reg, entity, component)
 
     removeComponent[TestComponent](reg, entity)
 
@@ -31,7 +33,7 @@ suite "ecs":
     var reg = newRegistry()
     var entity = reg.newEntity()
     var component = TestComponent(x: 1, y: 2)
-    addComponent[TestComponent](reg, entity, component)
+    addComponent(reg, entity, component)
 
     reg.destroyEntity(entity)
 
@@ -51,16 +53,18 @@ suite "ecs":
     check not reg.isEntityValid(entity1)
     check reg.isEntityValid(entity2)
 
-  test "can iterate on entities with components":
+  test "can check if entities has all components":
     var reg = newRegistry()
     var entity1 = reg.newEntity()
     var entity2 = reg.newEntity()
     var component1 = TestComponent(x: 1, y: 2)
-    var component2 = TestComponent(x: 1, y: 2)
-    addComponent[TestComponent](reg, entity1, component1)
-    addComponent[TestComponent](reg, entity2, component2)
+    var component2 = OtherComponent(z: 3)
+    addComponent(reg, entity1, component1)
+    addComponent(reg, entity1, component2)
+    addComponent(reg, entity2, component2)
 
-    for e in entitiesWith(reg, TestComponent):
-      echo $e
-
-    check false
+    check hasAllComponents(reg, entity1)
+    check hasAllComponents(reg, entity1, TestComponent)
+    check hasAllComponents(reg, entity1, TestComponent, OtherComponent)
+    check not hasAllComponents(reg, entity2, TestComponent)
+    check not hasAllComponents(reg, entity2, TestComponent, OtherComponent)
