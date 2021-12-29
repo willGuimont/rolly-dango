@@ -1,6 +1,8 @@
 import std/tables
 import std/packedsets
 import std/hashes
+import std/sequtils
+import std/macros
 
 type
   Entity* = uint32
@@ -71,3 +73,16 @@ proc hasComponent*[T](reg: Registry, entity: Entity): bool =
 
 # TODO iterator that
 # iterator entitiesWith[varargs[untyped]]
+macro entitiesWith*(forLoop: ForLoopStmt): auto =
+  echo "\nCode before:\n", toStrLit(forLoop).strVal
+  result = newTree(nnkStmtList)
+  let
+    forVar = forLoop[0]
+    reg = forLoop[1][1]
+    types = forLoop[1][2]
+    forBody = forLoop[2]
+  for t in types:
+    let forBodyCopy = newBlockStmt(copyNimTree(forBody))
+    result.add()
+
+  echo "\nCode after:", toStrLit(result).strVal, "\n"

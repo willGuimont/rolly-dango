@@ -50,3 +50,17 @@ suite "ecs":
 
     check not reg.isEntityValid(entity1)
     check reg.isEntityValid(entity2)
+
+  test "can iterate on entities with components":
+    var reg = newRegistry()
+    var entity1 = reg.newEntity()
+    var entity2 = reg.newEntity()
+    var component1 = TestComponent(x: 1, y: 2)
+    var component2 = TestComponent(x: 1, y: 2)
+    addComponent[TestComponent](reg, entity1, component1)
+    addComponent[TestComponent](reg, entity2, component2)
+
+    for e in entitiesWith(reg, TestComponent):
+      echo $e
+
+    check false
