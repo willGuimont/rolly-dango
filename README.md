@@ -25,9 +25,19 @@ Phase 3:
 
 ## Dependencies
 
-Install [WASM-4](https://wasm4.org/docs/getting-started/setup).
+For Nim, we found that we needed to add functions to the [WASM-4](https://wasm4.org/docs/getting-started/setup) runtime (`wasi_snapshot_preview1.proc_exit`), so to build this game, you`ll need to install [willGuimont/wasm4](https://github.com/willGuimont/wasm4).
 
-Optionally, you can install binaryen to optimize further the binary size.
+To install it, run the following commands:
+
+```bash
+git clone https://github.com/willGuimont/wasm4
+cd wasm4/runtimes/web
+npm install && npm run build
+cd ../../cli
+npm install && npm link
+```
+
+Optionally, you can install [binaryen](https://github.com/WebAssembly/binaryen) to optimize further the binary size.
 
 ## Build cartridge
 
