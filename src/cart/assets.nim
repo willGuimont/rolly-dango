@@ -1,6 +1,6 @@
 import wasm4
 
-type Sprite* = object
+type Sprite* = ref object
   width*: uint32
   height*: uint32
   flags*: uint32
