@@ -6,3 +6,12 @@ html, body {
 canvas {
   display: block;
 }
+
+h {
+  font-size: larger;
+  font-weight: bold;
+}
+
+details {
+  padding-left: 1cm;
+}

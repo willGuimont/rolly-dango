@@ -6,4 +6,4 @@ Install `p5.vscode` vscode extension.
 
 ## Running
 
-Open `index.html` in your browser.
+Run `npx http-serve`.
