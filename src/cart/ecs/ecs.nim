@@ -52,6 +52,11 @@ proc addComponent*[T](reg: Registry, entity: Entity, component: T) =
     reg.components[componentHash] = newTable[Entity, Component]()
   reg.components[componentHash][entity] = component
 
+proc removeComponent*[T](reg: Registry, entity: Entity) =
+  let componentHash = ($T).hash()
+  if reg.components.hasKey(componentHash):
+    reg.components[componentHash].del(entity)
+
 proc getComponent*[T](reg: Registry, entity: Entity): T =
   let componentHash = ($T).hash()
   if not reg.components.hasKey(componentHash):
@@ -63,10 +68,14 @@ proc getComponent*[T](reg: Registry, entity: Entity): T =
     raise newException(ValueError, message)
   return (T)reg.components[componentHash][entity]
 
-proc removeComponent*[T](reg: Registry, entity: Entity) =
-  let componentHash = ($T).hash()
-  if reg.components.hasKey(componentHash):
-    reg.components[componentHash].del(entity)
+macro getComponents*(reg: Registry, entity: Entity, componentTypes: varargs[
+    untyped]): untyped =
+  var tuplesElements: seq[NimNode] = @[]
+  for c in componentTypes:
+    let getComp = quote do:
+      `reg`.getComponent[:`c`](`entity`)
+    tuplesElements.add(getComp)
+  result = nnkTupleConstr.newTree(tuplesElements)
 
 proc hasComponent*[T](reg: Registry, entity: Entity): bool =
   let componentHash = ($T).hash()
@@ -91,4 +100,15 @@ macro entitiesWith*(reg: Registry, componentTypes: varargs[untyped]): untyped =
     filter(`reg`.allEntities, proc(
         e: Entity): bool = `reg`.hasAllComponents(e, `componentTypes`))
 
-# TODO add macro to return multiple components directly
+macro makeComponentTypes(componentTypes: varargs[untyped]): untyped =
+  var tuplesElements: seq[NimNode] = @[]
+  for c in componentTypes:
+    tuplesElements.add(ident($c))
+  result = nnkTupleConstr.newTree(tuplesElements)
+
+macro entitiesWithComponents*(reg: Registry, componentTypes: varargs[
+    untyped]): untyped =
+  result = quote do:
+    map(`reg`.entitiesWith(`componentTypes`), proc(
+        e: Entity): makeComponentTypes(`componentTypes`) = `reg`.getComponents(
+        e, `componentTypes`))
