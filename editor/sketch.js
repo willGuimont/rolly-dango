@@ -164,6 +164,9 @@ function view() {
         drawTile(world[x][y][z]);
 
         if (x == selectedX && y == selectedY && z == zLevel) {
+          if (world[x][y][z] == TILE_AIR) {
+            box(TILE_SIZE);
+          }
           drawTile(selectedTileType);
         }
 
@@ -235,7 +238,7 @@ function draw() {
 }
 
 function exportWorld() {
-  var output = `const worldData: array[${WORLD_SIZE*WORLD_SIZE*WORLD_HEIGHT}, uint8] = [`
+  var output = `const worldData: array[${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}, uint8] = [`
   var firstTile = true;
 
   for (let z = 0; z < WORLD_HEIGHT; z++) {
@@ -246,10 +249,10 @@ function exportWorld() {
           output += "'u8";
           firstTile = false;
         }
-        let isLast = z == WORLD_HEIGHT - 1&& x == WORLD_SIZE - 1 && y == WORLD_SIZE - 1
+        let isLast = z == WORLD_HEIGHT - 1 && x == WORLD_SIZE - 1 && y == WORLD_SIZE - 1
         if (!isLast) {
           output += ", "
-        } 
+        }
       }
     }
   }
