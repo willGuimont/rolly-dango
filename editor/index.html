@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Level Editor</title>
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+  <script src="libraries/p5.min.js"></script>
+  <script src="libraries/p5.sound.min.js"></script>
+</head>
+
+<body>
+  <p id="zLevel"></p>
+  <p id="tileType"></p>
+  <script src="sketch.js"></script>
+  <div id="sketch-holder"></div>
+  <details>
+    <summary>Controls</summary>
+    <h>General Controls</h>
+    <p>e to increase zLevel</p>
+    <p>q to decrease zLevel</p>
+    <p>t to toggle text mode</p>
+    <p>o to export code</p>
+    <p>l to load level</p>
+    <h>View mode</h>
+    <p>Controls: WASD to move in view mode</p>
+    <h>Edit mode</h>
+    <p>Number keys to select tile type</p>
+    <p>Click to se tile at zLevel</p>
+    <p>Press number keys to select tile type</p>
+    <p>f to start fill</p>
+    <ul>
+      <li>0 - Air</li>
+      <li>1 - Cube</li>
+      <li>2 - Slope left</li>
+      <li>3 - Slope right</li>
+    </ul>
+  </details>
+  <details>
+    <summary>Exported code</summary>
+    <div id="exported">
+  </details>
+  <details>
+    <summary>Save Level</summary>
+    <div id="saveLevel"></div>
+  </details>
+  <details>
+    <summary>Load Level</summary>
+    <input type="text" id="levelLoad" />
+  </details>
+</body>
+
+</html>
