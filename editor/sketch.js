@@ -257,7 +257,7 @@ function exportWorld() {
 }
 
 function saveLevel() {
-  select('#saveLevel').html(JSON.stringify({world, WORLD_SIZE, WORLD_HEIGHT}))
+  select('#saveLevel').html(JSON.stringify({ world, WORLD_SIZE, WORLD_HEIGHT }))
 }
 
 function levelLoad() {
@@ -279,6 +279,12 @@ function keyPressed() {
 
   if (key == 't') {
     showText = !showText;
+  }
+
+  if (key == 'r') {
+    xAngle = PI / 3.5;
+    yAngle = 0;
+    zAngle = PI / 4;
   }
 
   if (key == 'f') {
