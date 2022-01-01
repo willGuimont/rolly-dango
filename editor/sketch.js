@@ -35,9 +35,8 @@ for (let x = 0; x < WORLD_SIZE; x++) {
 // for (let x = 0; x < WORLD_SIZE; x++) {
 //   for (let y = 0; y < WORLD_SIZE; y++) {
 //     for (let z = 0; z < WORLD_HEIGHT; z++) {
-//       if ((x + y) % 2 == 0)
-//       world[x][y][z] = TILE_SLOPE_RIGHT;
-//       else world[x][y][z] = TILE_SLOPE_LEFT;
+//       if (x == 0)
+//         world[x][y][z] = TILE_CUBE;
 //     }
 //   }
 // }
@@ -49,7 +48,9 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(2 * 800, 800, WEBGL);
+  var canvas = createCanvas(2 * 800, 800, WEBGL);
+  canvas.parent('sketch-holder');
+
   xAngle = PI / 3.5;
   yAngle = 0;
   zAngle = PI / 4;
@@ -86,6 +87,7 @@ function drawSlope() {
 }
 
 function drawTile(tile) {
+  push();
   if (tile == TILE_AIR) {
 
   } else if (tile == TILE_CUBE) {
@@ -99,6 +101,7 @@ function drawTile(tile) {
   } else {
     console.log("invalid tile type: " + tile)
   }
+  pop();
 }
 
 function showZLevel() {
@@ -146,9 +149,6 @@ function view() {
   textSize(20);
 
   for (let z = 0; z < WORLD_HEIGHT; z++) {
-    if (z >= zLevel + 1) {
-      continue;
-    }
     for (let x = 0; x < WORLD_SIZE; x++) {
       for (let y = 0; y < WORLD_SIZE; y++) {
         if (x == selectedX && y == selectedY && z == zLevel) {
@@ -216,7 +216,7 @@ function edit() {
 
       if (showText) {
         fill(0);
-        text(y + x * WORLD_SIZE, (x + 0.25) * size, (y + 0.75) * size)
+        text(y + x * WORLD_SIZE + zLevel * WORLD_SIZE * WORLD_SIZE, (x + 0.25) * size, (y + 0.75) * size)
         fill(255);
       }
     }
@@ -232,6 +232,33 @@ function draw() {
 
   showZLevel();
   showTileType();
+}
+
+function exportWorld() {
+  var output = `const worldData: array[${WORLD_SIZE*WORLD_SIZE*WORLD_HEIGHT}, uint8] = [`
+  var firstTile = true;
+
+  for (let z = 0; z < WORLD_HEIGHT; z++) {
+    for (let x = 0; x < WORLD_SIZE; x++) {
+      for (let y = 0; y < WORLD_SIZE; y++) {
+        output += world[x][y][z]
+        if (firstTile) {
+          output += "'u8";
+          firstTile = false;
+        }
+        let isLast = z == WORLD_HEIGHT - 1&& x == WORLD_SIZE - 1 && y == WORLD_SIZE - 1
+        if (!isLast) {
+          output += ", "
+        } 
+      }
+    }
+  }
+  output += "]<br/>"
+  output += `const worldXSize: int = ${WORLD_SIZE}<br/>`
+  output += `const worldYSize: int = ${WORLD_SIZE}<br/>`
+  output += `const worldZSize: int = ${WORLD_HEIGHT}<br/>`
+
+  select("#exported").html(output);
 }
 
 function keyPressed() {
@@ -254,6 +281,10 @@ function keyPressed() {
   if ('0' <= key && key <= '9') {
     selectedTileType = keyCode - 48;
   }
+
+  if (key == 'o') {
+    exportWorld();
+  }
 }
 
 function keyReleased() {
@@ -264,19 +295,27 @@ function mouseClicked() {
   if (isFilling) {
     if (selectedX >= 0 && selectedY >= 0) {
       if (fillStart.length == 0) {
-        console.log('START');
-        fillStart = [selectedX, selectedY]
+        fillStart = [selectedX, selectedY, zLevel];
+        console.log('START ' + fillStart);
       } else {
-        console.log('END');
-        fillEnd = [selectedX, selectedY]
+        fillEnd = [selectedX, selectedY, zLevel]
+        console.log('END ' + fillEnd);
 
-        for (let x = fillStart[0]; x <= fillEnd[0]; x++) {
-          for (let y = fillStart[1]; y <= fillEnd[1]; y++) {
-            world[x][y][zLevel] = selectedTileType;
+        let xMin = min(fillStart[0], fillEnd[0]);
+        let yMin = min(fillStart[1], fillEnd[1]);
+        let zMin = min(fillStart[2], fillEnd[2]);
+        let xMax = max(fillStart[0], fillEnd[0]);
+        let yMax = max(fillStart[1], fillEnd[1]);
+        let zMax = max(fillStart[2], fillEnd[2]);
+        for (let x = xMin; x <= xMax; x++) {
+          for (let y = yMin; y <= yMax; y++) {
+            for (let z = zMin; z <= zMax; z++) {
+              world[x][y][z] = selectedTileType;
+            }
           }
-          
+
         }
-        
+
         fillStart = [];
         fillEnd = [];
         isFilling = false;
