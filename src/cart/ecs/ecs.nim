@@ -19,6 +19,9 @@ proc newRegistry*(): Registry =
   result.lastEntityId = 0
   result.components = newTable[Hash, ComponentStore]()
 
+proc len*(reg: Registry): int =
+  result = card(reg.validEntities)
+
 proc newEntity*(reg: Registry): Entity =
   let newId = reg.lastEntityId
   reg.validEntities.incl(reg.lastEntityId)
