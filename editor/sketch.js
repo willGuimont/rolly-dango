@@ -32,15 +32,6 @@ for (let x = 0; x < WORLD_SIZE; x++) {
   }
 }
 
-// for (let x = 0; x < WORLD_SIZE; x++) {
-//   for (let y = 0; y < WORLD_SIZE; y++) {
-//     for (let z = 0; z < WORLD_HEIGHT; z++) {
-//       if (x == 0)
-//         world[x][y][z] = TILE_CUBE;
-//     }
-//   }
-// }
-
 let font;
 
 function preload() {
@@ -89,7 +80,7 @@ function drawSlope() {
 function drawTile(tile) {
   push();
   if (tile == TILE_AIR) {
-
+    // don't render air
   } else if (tile == TILE_CUBE) {
     box(TILE_SIZE);
   } else if (tile == TILE_SLOPE_RIGHT) {
@@ -124,7 +115,6 @@ function showTileType() {
 }
 
 function view() {
-  perspective();
   // w
   if (keyIsDown(87)) {
     xAngle -= 0.01;
@@ -141,6 +131,8 @@ function view() {
   if (keyIsDown(68)) {
     zAngle += 0.01;
   }
+
+  perspective();
 
   translate(0, -0.6 * WORLD_SIZE * TILE_SIZE, 0);
   rotateX(xAngle);
@@ -290,19 +282,13 @@ function keyPressed() {
   }
 }
 
-function keyReleased() {
-
-}
-
 function mouseClicked() {
   if (isFilling) {
     if (selectedX >= 0 && selectedY >= 0) {
       if (fillStart.length == 0) {
         fillStart = [selectedX, selectedY, zLevel];
-        console.log('START ' + fillStart);
       } else {
         fillEnd = [selectedX, selectedY, zLevel]
-        console.log('END ' + fillEnd);
 
         let xMin = min(fillStart[0], fillEnd[0]);
         let yMin = min(fillStart[1], fillEnd[1]);
@@ -310,6 +296,7 @@ function mouseClicked() {
         let xMax = max(fillStart[0], fillEnd[0]);
         let yMax = max(fillStart[1], fillEnd[1]);
         let zMax = max(fillStart[2], fillEnd[2]);
+
         for (let x = xMin; x <= xMax; x++) {
           for (let y = yMin; y <= yMax; y++) {
             for (let z = zMin; z <= zMax; z++) {
