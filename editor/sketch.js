@@ -63,9 +63,8 @@ function drawSlope() {
   let six = () => vertex(1, 0, 1);
   let seven = () => vertex(1, 1, 1);
 
-  scale(TILE_SIZE);
-
   push();
+  scale(TILE_SIZE);
 
   translate(-0.5, -0.5, -0.5);
 
