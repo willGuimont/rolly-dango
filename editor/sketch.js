@@ -17,6 +17,10 @@ var showText = false;
 var selectedX = -1;
 var selectedY = -1;
 
+var isFilling = false;
+var fillStart = []
+var fillEnd = []
+
 var world = new Array();
 for (let x = 0; x < WORLD_SIZE; x++) {
   world.push(new Array());
@@ -243,6 +247,10 @@ function keyPressed() {
     showText = !showText;
   }
 
+  if (key == 'f') {
+    isFilling = true;
+  }
+
   if ('0' <= key && key <= '9') {
     selectedTileType = keyCode - 48;
   }
@@ -253,8 +261,29 @@ function keyReleased() {
 }
 
 function mouseClicked() {
-  if (selectedX >= 0 && selectedY >= 0) {
+  if (isFilling) {
+    if (selectedX >= 0 && selectedY >= 0) {
+      if (fillStart.length == 0) {
+        console.log('START');
+        fillStart = [selectedX, selectedY]
+      } else {
+        console.log('END');
+        fillEnd = [selectedX, selectedY]
+
+        for (let x = fillStart[0]; x <= fillEnd[0]; x++) {
+          for (let y = fillStart[1]; y <= fillEnd[1]; y++) {
+            world[x][y][zLevel] = selectedTileType;
+          }
+          
+        }
+        
+        fillStart = [];
+        fillEnd = [];
+        isFilling = false;
+      }
+    }
+  }
+  else if (selectedX >= 0 && selectedY >= 0) {
     world[selectedX][selectedY][zLevel] = selectedTileType;
-    console.log("Setting (" + selectedX + ", " + selectedY + ", " + zLevel + ") to " + selectedTileType);
   }
 }
