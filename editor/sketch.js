@@ -144,7 +144,7 @@ function view() {
     for (let x = 0; x < WORLD_SIZE; x++) {
       for (let y = 0; y < WORLD_SIZE; y++) {
         if (x == selectedX && y == selectedY && z == zLevel) {
-          fill(0, 255, 0, 125);
+          fill(252, 171, 251, 125);
         } else if (x == 0 && y == 0 && z == 0) {
           fill(255, 0, 0);
         } else {
@@ -193,7 +193,7 @@ function edit() {
 
       if (x * size < xPos && xPos < (x + 1) * size
         && y * size < yPos && yPos < (y + 1) * size) {
-        fill(0, 255, 0);
+        fill(252, 171, 251);
         selectedX = x;
         selectedY = y;
       } else if (x == 0 && y == 0) {
