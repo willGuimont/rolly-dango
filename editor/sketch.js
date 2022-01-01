@@ -1,6 +1,6 @@
 const TILE_SIZE = 25;
-const WORLD_SIZE = 10;
-const WORLD_HEIGHT = 5;
+var WORLD_SIZE = 10;
+var WORLD_HEIGHT = 5;
 
 var xAngle = 0;
 var yAngle = 0;
@@ -256,6 +256,18 @@ function exportWorld() {
   select("#exported").html(output);
 }
 
+function saveLevel() {
+  select('#saveLevel').html(JSON.stringify({world, WORLD_SIZE, WORLD_HEIGHT}))
+}
+
+function levelLoad() {
+  var code = select('#levelLoad').value();
+  var loaded = JSON.parse(code);
+  world = loaded["world"];
+  WORLD_SIZE = loaded["WORLD_SIZE"];
+  WORLD_HEIGHT = loard["WORLD_HEIGHT"];
+}
+
 function keyPressed() {
   if (key == 'q') {
     zLevel = max(zLevel - 1, 0);
@@ -279,6 +291,11 @@ function keyPressed() {
 
   if (key == 'o') {
     exportWorld();
+    saveLevel();
+  }
+
+  if (key == 'l') {
+    levelLoad();
   }
 }
 
@@ -303,7 +320,6 @@ function mouseClicked() {
               world[x][y][z] = selectedTileType;
             }
           }
-
         }
 
         fillStart = [];
