@@ -13,6 +13,7 @@ const TILE_SLOPE_LEFT = 2;
 const TILE_SLOPE_RIGHT = 3;
 var selectedTileType = TILE_CUBE;
 
+var showText = false;
 var selectedX = -1;
 var selectedY = -1;
 
@@ -27,12 +28,20 @@ for (let x = 0; x < WORLD_SIZE; x++) {
   }
 }
 
-for (let x = 0; x < WORLD_SIZE; x++) {
-  for (let y = 0; y < WORLD_SIZE; y++) {
-    for (let z = 0; z < WORLD_HEIGHT; z++) {
-      world[x][y][z] = TILE_SLOPE_RIGHT;
-    }
-  }
+// for (let x = 0; x < WORLD_SIZE; x++) {
+//   for (let y = 0; y < WORLD_SIZE; y++) {
+//     for (let z = 0; z < WORLD_HEIGHT; z++) {
+//       if ((x + y) % 2 == 0)
+//       world[x][y][z] = TILE_SLOPE_RIGHT;
+//       else world[x][y][z] = TILE_SLOPE_LEFT;
+//     }
+//   }
+// }
+
+let font;
+
+function preload() {
+  font = loadFont("assets/Inconsolata-Black.ttf");
 }
 
 function setup() {
@@ -40,50 +49,37 @@ function setup() {
   xAngle = PI / 3.5;
   yAngle = 0;
   zAngle = PI / 4;
+
+  textFont(font);
 }
 
 function drawSlope() {
+  let zero = () => vertex(0, 0, 0);
+  let one = () => vertex(0, 1, 0);
+  let two = () => vertex(1, 0, 0);
+  let three = () => vertex(1, 1, 0);
+  let four = () => vertex(0, 0, 1);
+  let five = () => vertex(0, 1, 1);
+  let six = () => vertex(1, 0, 1);
+  let seven = () => vertex(1, 1, 1);
+
   scale(TILE_SIZE);
+
+  push();
 
   translate(-0.5, -0.5, -0.5);
 
-  beginShape();
-  vertex(0, 0, 0);
-  vertex(0, 1, 0);
-  vertex(1, 1, 0);
-  vertex(1, 0, 0);
-  vertex(0, 0, 0);
-  endShape(CLOSE);
+  beginShape(TRIANGLES);
 
-  beginShape();
-  vertex(0, 0, 1);
-  vertex(0, 1, 0);
-  vertex(1, 1, 0);
-  vertex(1, 0, 1);
-  vertex(0, 0, 1);
-  endShape(CLOSE);
+  zero(); six(); seven();
+  zero(); one(); seven();
+  three(); six(); seven();
+  two(); three(); six();
+  one(); three(); seven();
+  zero(); two(); six();
 
-  beginShape();
-  vertex(0, 0, 0);
-  vertex(1, 0, 0);
-  vertex(1, 0, 1);
-  vertex(0, 0, 1);
-  vertex(0, 0, 0);
-  endShape(CLOSE);
-
-  beginShape();
-  vertex(0, 0, 0);
-  vertex(0, 1, 0);
-  vertex(0, 0, 1);
-  vertex(0, 0, 0);
-  endShape(CLOSE);
-
-  beginShape();
-  vertex(1, 0, 0);
-  vertex(1, 1, 0);
-  vertex(1, 0, 1);
-  vertex(1, 0, 0);
-  endShape(CLOSE);
+  endShape(TRIANGLES);
+  pop();
 }
 
 function drawTile(tile) {
@@ -91,9 +87,10 @@ function drawTile(tile) {
 
   } else if (tile == TILE_CUBE) {
     box(TILE_SIZE);
-  } else if (tile == TILE_SLOPE_LEFT) {
-    drawSlope();
   } else if (tile == TILE_SLOPE_RIGHT) {
+    rotateZ(PI);
+    drawSlope();
+  } else if (tile == TILE_SLOPE_LEFT) {
     rotateZ(-PI / 2);
     drawSlope();
   } else {
@@ -143,6 +140,7 @@ function view() {
   rotateX(xAngle);
   rotateY(yAngle);
   rotateZ(zAngle);
+  textSize(20);
 
   for (let z = 0; z < WORLD_HEIGHT; z++) {
     if (z >= zLevel + 1) {
@@ -150,7 +148,9 @@ function view() {
     }
     for (let x = 0; x < WORLD_SIZE; x++) {
       for (let y = 0; y < WORLD_SIZE; y++) {
-        if (x == 0 && y == 0 && z == 0) {
+        if (x == selectedX && y == selectedY && z == zLevel) {
+          fill(0, 255, 0, 125);
+        } else if (x == 0 && y == 0 && z == 0) {
           fill(255, 0, 0);
         } else {
           fill(255);
@@ -159,6 +159,17 @@ function view() {
         translate(x * TILE_SIZE, y * TILE_SIZE, z * TILE_SIZE);
 
         drawTile(world[x][y][z]);
+
+        if (x == selectedX && y == selectedY && z == zLevel) {
+          drawTile(selectedTileType);
+        }
+
+        if (showText && z == zLevel) {
+          translate(0, 0, TILE_SIZE);
+          fill(0);
+          text(y + x * WORLD_SIZE, -TILE_SIZE / 2, TILE_SIZE / 4)
+          fill(255);
+        }
 
         pop();
       }
@@ -174,6 +185,7 @@ function edit() {
 
   selectedX = -1;
   selectedY = -1;
+  textSize(24);
 
   for (let x = 0; x < WORLD_SIZE; x++) {
     for (let y = 0; y < WORLD_SIZE; y++) {
@@ -198,6 +210,12 @@ function edit() {
       rect(0, 0, size, size)
 
       pop();
+
+      if (showText) {
+        fill(0);
+        text(y + x * WORLD_SIZE, (x + 0.25) * size, (y + 0.75) * size)
+        fill(255);
+      }
     }
   }
   pop();
@@ -220,6 +238,14 @@ function keyPressed() {
 
   if (key == 'e') {
     zLevel = min(zLevel + 1, WORLD_HEIGHT - 1);
+  }
+
+  if (key == 't') {
+    showText = !showText;
+  }
+
+  if ('0' <= key && key <= '9') {
+    selectedTileType = keyCode - 48;
   }
 }
 
