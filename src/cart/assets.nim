@@ -17,8 +17,6 @@ macro makeSprite*(data: untyped): untyped =
         var `sprite`*: Sprite = Sprite(width: `width`, height: `height`,
                 flags: `flags`, data: `data`)
 
-
-# dango16px
 const dangoWidth = 16
 const dangoHeight = 16
 const dangoFlags = BLIT_2BPP
@@ -29,7 +27,6 @@ var dango: array[64, uint8] = [0x00'u8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 
-# tile16px
 const tileWidth = 16
 const tileHeight = 16
 const tileFlags = BLIT_2BPP
@@ -42,8 +39,3 @@ var tile: array[64, uint8] = [0x00'u8, 0x01, 0x00, 0x00, 0x00, 0x1a, 0x90,
 
 makeSprite(dango)
 makeSprite(tile)
-
-
-
-
-

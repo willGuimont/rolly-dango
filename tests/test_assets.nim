@@ -2,11 +2,10 @@ import unittest
 import cart/assets
 import cart/wasm4
 
-
-const dangoWidth = 16
-const dangoHeight = 16
-const dangoFlags = BLIT_2BPP
-var dango: array[64, uint8] = [0x00'u8, 0x00, 0x00, 0x00, 0x00,
+const spriteTestWidth = 16
+const spriteTestHeight = 16
+const spriteTestFlags = BLIT_2BPP
+var spriteTest: array[64, uint8] = [0x00'u8, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x05, 0x50, 0x00, 0x00, 0x1a, 0xa4, 0x00, 0x00,
         0x6a, 0xa9, 0x00, 0x00, 0x69, 0x99, 0x00, 0x00, 0x69, 0x99,
@@ -14,15 +13,10 @@ var dango: array[64, uint8] = [0x00'u8, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 
-
-makeSprite(dango)
-
+makeSprite(spriteTest)
 suite "assets":
-
     test "makeSprite macro returns a sprite with right argument":
-
-        assert dangoSprite.width == dangoWidth
-        assert dangoSprite.height == dangoHeight
-        assert dangoSprite.flags == dangoFlags
-        assert dangoSprite.data == dango
-
+        assert spriteTestSprite.width == spriteTestWidth
+        assert spriteTestSprite.height == spriteTestHeight
+        assert spriteTestSprite.flags == spriteTestFlags
+        assert spriteTestSprite.data == spriteTest
