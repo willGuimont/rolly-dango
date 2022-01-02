@@ -39,14 +39,14 @@ proc buildWorld() =
   for i in 0..nbTile:
     for j in 0..nbTile:
       let tileEntity1 = reg.newEntity()
-      let tileSpriteComponent1 = SpriteComponent(sprite: tile)
+      let tileSpriteComponent1 = SpriteComponent(sprite: tileSprite)
       let tilePositionComponent1: PositionComponent = PositionComponent(
         x: int32(i), y: int32(j), z: 0)
       reg.addComponent(tileEntity1, tileSpriteComponent1)
       reg.addComponent(tileEntity1, tilePositionComponent1)
 
   var dangoEntity = reg.newEntity()
-  var dangoSpriteComponent = SpriteComponent(sprite: dango)
+  var dangoSpriteComponent = SpriteComponent(sprite: dangoSprite)
   var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 1)
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
