@@ -2,10 +2,10 @@ import std/macros
 import ../ecs/ecs
 
 type Sprite* = ref object
-    width*: uint32
-    height*: uint32
-    flags*: uint32
-    data*: array[64, uint8]
+    width*: uint8
+    height*: uint8
+    flags*: uint8
+    data*: ptr array[64, uint8]
 
 macro makeSprite*(data: untyped): untyped =
     let width = ident($data & "Width")
@@ -15,7 +15,7 @@ macro makeSprite*(data: untyped): untyped =
 
     return quote do:
         var `sprite`*: Sprite = Sprite(width: `width`, height: `height`,
-                flags: `flags`, data: `data`)
+                flags: `flags`, data: addr `data`)
 
 type
     SpriteComponent* = ref object of Component
