@@ -47,8 +47,7 @@ proc buildWorld() =
 
   var dangoEntity = reg.newEntity()
   var dangoSpriteComponent = SpriteComponent(sprite: dangoSprite)
-  var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 1)
-
+  var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 5)
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
 
