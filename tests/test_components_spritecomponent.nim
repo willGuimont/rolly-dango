@@ -4,7 +4,7 @@ import cart/components/spritecomponent
 const spriteTestWidth = 16
 const spriteTestHeight = 16
 const spriteTestFlags = 2
-var spriteTest: array[64, uint8] = [0x00'u8, 0x00, 0x00, 0x00, 0x00,
+const spriteTest: array[64, uint8] = [0x00'u8, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x05, 0x50, 0x00, 0x00, 0x1a, 0xa4, 0x00, 0x00,
         0x6a, 0xa9, 0x00, 0x00, 0x69, 0x99, 0x00, 0x00, 0x69, 0x99,
@@ -18,4 +18,4 @@ suite "assets":
         assert spriteTestSprite.width == spriteTestWidth
         assert spriteTestSprite.height == spriteTestHeight
         assert spriteTestSprite.flags == spriteTestFlags
-        assert spriteTestSprite.data == spriteTest
+        assert spriteTestSprite.data[] == spriteTest
