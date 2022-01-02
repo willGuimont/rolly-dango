@@ -3,7 +3,7 @@ import cart/assets
 import cart/wasm4
 
 suite "assets":
-    test "cmdToString Macro returns a sprite":
+    test "makeSprite macro returns a sprite":
         const dangoWidth = 16
         const dangoHeight = 16
         const dangoFlags = BLIT_2BPP
@@ -16,4 +16,4 @@ suite "assets":
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 
 
-        cmdToSprite(dango)
+        var dangoSprite:Sprite = makeSprite(dango)

@@ -7,6 +7,15 @@ type Sprite* = ref object
     flags*: uint32
     data*: array[64, uint8]
 
+macro makeSprite*(data: untyped): untyped =
+    let width = ident($`data` & "Width")
+    let height = ident($`data` & "Height")
+    let flags = ident($`data` & "Flags")
+    let sprite = ident($`data` & "Sprite")
+
+    return quote do:
+        Sprite(`width`, `height`, `flags`, `data`)
+
 #var tile: Sprite = Sprite(width: 16, height: 16, flags: BLIT_2BPP,
 #    data: tileData)
 
@@ -32,14 +41,7 @@ var tile16px: array[64, uint8] = [0x00'u8, 0x01, 0x00, 0x00, 0x00, 0x1a, 0x90,
         0xa8, 0x1a, 0xa9, 0xaa, 0x90, 0x01, 0xaa, 0xa9, 0x00, 0x00, 0x19, 0x90,
         0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 
-macro cmdToSprite*(data: untyped): untyped =
-    let width = ident($`data` & "Width")
-    let height = ident($`data` & "Height")
-    let flags = ident($`data` & "Flags")
-    let sprite = ident($`data` & "Sprite")
 
-    return quote do:
-        var `sprite` = Sprite(`width`, `height`, `flags`, `data`)
 
 
 
