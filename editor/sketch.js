@@ -9,8 +9,10 @@ var zLevel = 0;
 
 const TILE_AIR = 0;
 const TILE_CUBE = 1;
-const TILE_SLOPE_LEFT = 2;
+const TILE_SLOPE_FRONT = 2;
 const TILE_SLOPE_RIGHT = 3;
+const TILE_SLOPE_LEFT = 4;
+const TILE_SLOPE_BACK = 5;
 var selectedTileType = TILE_CUBE;
 
 var showText = false;
@@ -86,8 +88,14 @@ function drawTile(tile) {
   } else if (tile == TILE_SLOPE_RIGHT) {
     rotateZ(PI);
     drawSlope();
-  } else if (tile == TILE_SLOPE_LEFT) {
+  } else if (tile == TILE_SLOPE_FRONT) {
     rotateZ(-PI / 2);
+    drawSlope();
+  } else if (tile == TILE_SLOPE_LEFT) {
+    rotateZ(0);
+    drawSlope();
+  } else if (tile == TILE_SLOPE_BACK) {
+    rotateZ(-3 * PI / 2);
     drawSlope();
   } else {
     console.log("invalid tile type: " + tile)
@@ -105,10 +113,14 @@ function showTileType() {
     asString = "AIR";
   else if (selectedTileType == TILE_CUBE)
     asString = "CUBE";
-  else if (selectedTileType == TILE_SLOPE_LEFT)
-    asString = "SLOPE_LEFT";
+  else if (selectedTileType == TILE_SLOPE_FRONT)
+    asString = "SLOPE_FRONT";
   else if (selectedTileType == TILE_SLOPE_RIGHT)
     asString = "SLOPE_RIGHT";
+  else if (selectedTileType == TILE_SLOPE_LEFT)
+    asString = "SLOPE_LEFT";
+  else if (selectedTileType == TILE_SLOPE_BACK)
+    asString = "SLOPE_BACK";
   else
     console.log("asString invalid tileType: " + selectedTileType);
   select("#tileType").html("TyleType: " + asString);
@@ -156,10 +168,11 @@ function view() {
         drawTile(world[x][y][z]);
 
         if (x == selectedX && y == selectedY && z == zLevel) {
-          if (world[x][y][z] == TILE_AIR) {
+          if (selectedTileType == TILE_AIR) {
             box(TILE_SIZE);
+          } else {
+            drawTile(selectedTileType);
           }
-          drawTile(selectedTileType);
         }
 
         if (showText && z == zLevel) {
