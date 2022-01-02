@@ -1,4 +1,4 @@
-name: Nimble
+name: Run tests
 
 on:
   push:
@@ -21,4 +21,3 @@ jobs:
         if: runner.os != 'Windows'
       - uses: jiro4989/setup-nim-action@v1
       - run: nimble test -Y
-      - run: nimble rel -Y
