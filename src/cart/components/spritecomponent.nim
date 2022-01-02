@@ -15,7 +15,7 @@ macro makeSprite*(data: untyped): untyped =
 
     return quote do:
         var `sprite`*: Sprite = Sprite(width: `width`, height: `height`,
-                flags: `flags`, data: addr `data`)
+                flags: `flags`, data: unsafeAddr `data`)
 
 type
     SpriteComponent* = ref object of Component

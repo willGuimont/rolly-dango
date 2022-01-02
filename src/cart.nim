@@ -52,10 +52,9 @@ proc buildWorld() =
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
 
-buildWorld()
-
 proc start {.exportWasm.} =
   NimMain()
+  buildWorld()
 
 proc update {.exportWasm.} =
   render(reg)
