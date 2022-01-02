@@ -6,22 +6,7 @@ Rolly Dango, an isometric rolling puzzle made with [WASM-4](https://wasm4.org/).
 
 ## Game plan
 
-Here's the plan for the development of the game:
-
-Phase 1:
-- Implement a basic isometric renderer
-- Implement a controllable character
-- Implement the rolling mechanism with slopes
-
-Phase 2:
-- Implement sticky rice that stops the player's rolling
-- Implement spikes that kill you on contact
-- Implement breakable obstacles
-
-Phase 3:
-- Implement doors that open with keys
-- Implement moving tiles (elevator, moving platform)
-- Implement buttons to control game objects
+The development phases are detailed in [the milestones page](https://github.com/willGuimont/wasm4-game-jam-2022/milestones).
 
 ## Dependencies
 
