@@ -1,8 +1,8 @@
 import cart/wasm4
-import cart/assets
+import cart/assets/sprites
 import cart/ecs/ecs
-import cart/component/spritecomponent
-import cart/component/positioncomponent
+import cart/components/spritecomponent
+import cart/components/positioncomponent
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
