@@ -6,7 +6,6 @@ import cart/components/positioncomponent
 import cart/components/worldtilecomponent
 import cart/components/inputcomponent
 import cart/assets/levels/testlevel
-import cart/input/gamepad
 import cart/input/wasm4gamepad
 import cart/systems/inputsystem
 
@@ -14,6 +13,8 @@ import cart/systems/inputsystem
 # preventing unexpected errors
 proc NimMain {.importc.}
 
+var previousGamepad: uint8
+var pressedThisFrame: uint8
 var reg: Registry
 var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
@@ -48,15 +49,21 @@ proc buildWorld() =
       sprite: dangoSprite)
   var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 1)
   var dangoInputComponent: InputComponent = InputComponent(
-       gamepad: Wasm4Gamepad(gamepad: GAMEPAD1))
+       gamepad: getNewGamepad(addr pressedThisFrame))
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
   reg.addComponent(dangoEntity, dangoInputComponent)
+
+proc updateGamepad() =
+  var gamepad = GAMEPAD1[]
+  pressedThisFrame = gamepad and (gamepad xor previousGamepad);
+  previousGamepad = gamepad
 
 proc start {.exportWasm.} =
   NimMain()
   buildWorld()
 
 proc update {.exportWasm.} =
+  updateGamepad()
   render(reg)
   processInput(reg)

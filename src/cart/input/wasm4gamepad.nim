@@ -1,17 +1,19 @@
-import gamepad
 import ../wasm4
 
-type Wasm4Gamepad* = ref object of Gamepad
-    gamepad*: ptr uint8
+type Wasm4Gamepad* = ref object
+    gamepad: ptr uint8
 
-proc isLeft*(this: Wasm4Gamepad): bool =
-    return bool(this.gamepad[] and BUTTON_LEFT)
+proc getNewGamepad*(newGamepad: ptr uint8): Wasm4Gamepad =
+    return Wasm4Gamepad(gamepad: newGamepad)
 
-proc isRight*(this: Wasm4Gamepad): bool =
-    return bool(this.gamepad[] and BUTTON_RIGHT)
+proc isLeft*(wasm4Gamepad: Wasm4Gamepad): bool =
+    return bool(wasm4Gamepad.gamepad[] and BUTTON_LEFT)
 
-proc isFront*(this: Wasm4Gamepad): bool =
-    return bool(this.gamepad[] and BUTTON_UP)
+proc isRight*(wasm4Gamepad: Wasm4Gamepad): bool =
+    return bool(wasm4Gamepad.gamepad[] and BUTTON_RIGHT)
 
-proc isBack*(this: Wasm4Gamepad): bool =
-    return bool(this.gamepad[] and BUTTON_DOWN)
+proc isFront*(wasm4Gamepad: Wasm4Gamepad): bool =
+    return bool(wasm4Gamepad.gamepad[] and BUTTON_UP)
+
+proc isBack*(wasm4Gamepad: Wasm4Gamepad): bool =
+    return bool(wasm4Gamepad.gamepad[] and BUTTON_DOWN)
