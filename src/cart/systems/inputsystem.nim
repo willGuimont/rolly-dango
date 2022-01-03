@@ -10,10 +10,10 @@ proc moveRight(positionComponent: PositionComponent) =
     positionComponent.x -= 1
 
 proc moveFront(positionComponent: PositionComponent) =
-    positionComponent.y += 1
+    positionComponent.y -= 1
 
 proc moveBack(positionComponent: PositionComponent) =
-    positionComponent.y -= 1
+    positionComponent.y += 1
 
 proc processInput*(reg: Registry) =
     if reg != nil:
