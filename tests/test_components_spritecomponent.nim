@@ -18,4 +18,4 @@ suite "spritecomponent":
         check spriteTestSprite.width == spriteTestWidth
         check spriteTestSprite.height == spriteTestHeight
         check spriteTestSprite.flags == spriteTestFlags
-        check spriteTestSprite.data[] == spriteTest
+        check spriteTestSprite.data == unsafeAddr spriteTest[0]
