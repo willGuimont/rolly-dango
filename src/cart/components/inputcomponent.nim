@@ -1,5 +1,6 @@
 import ../ecs/ecs
 import ../input/gamepad
+import ../input/wasm4gamepad
 
 type InputComponent* = ref object of Component
-  gamepad*: Gamepad
+  gamepad*: Wasm4Gamepad

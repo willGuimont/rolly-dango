@@ -48,7 +48,7 @@ proc buildWorld() =
       sprite: dangoSprite)
   var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 1)
   var dangoInputComponent: InputComponent = InputComponent(
-      gamepad: Wasm4Gamepad(gamepad: GAMEPAD1[]))
+       gamepad: Wasm4Gamepad(gamepad: GAMEPAD1))
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
   reg.addComponent(dangoEntity, dangoInputComponent)
@@ -59,4 +59,4 @@ proc start {.exportWasm.} =
 
 proc update {.exportWasm.} =
   render(reg)
-  move(reg)
+  processInput(reg)
