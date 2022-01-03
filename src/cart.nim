@@ -28,7 +28,7 @@ proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   return (x: iso_x, y: isoY)
 
 proc render(reg: Registry) {.exportWasm.} =
-  DRAW_COLORS[] = 0x0320
+  DRAW_COLORS[] = 0x4320
 
   if reg != nil:
     for entity in reg.entitiesWith(SpriteComponent, PositionComponent):
