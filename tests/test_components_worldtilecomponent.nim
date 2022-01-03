@@ -29,7 +29,7 @@ const worldData: array[worldSize, uint8] = [1'u8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-makeLevel(testLevel)
+makeLevel(aLevel, worldSize)
 
 proc notAir(x: uint8): int =
     return if x != 0: 1 else: 0
@@ -59,7 +59,7 @@ proc countOf(reg: Registry, t: WorldTileType): int =
 suite "worldtilecomponent":
     test "build level creates enough entities of each type":
         var reg = newRegistry()
-        reg.buildLevel(testLevel)
+        reg.buildLevel(aLevel)
 
         check len(reg) == worldData.map(notAir).foldl(a + b)
         check reg.countOf(wttTile) == worldData.map(isTile).foldl(a + b)

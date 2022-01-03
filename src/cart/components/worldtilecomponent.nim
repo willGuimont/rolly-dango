@@ -16,11 +16,10 @@ type
     z: int
     data: T
 
-
 macro makeLevel*(name: untyped, worldSize: untyped): untyped =
   return quote do:
-    var `name`* = Level[array[`worldSize`,
-        uint8]](x: worldXSize, y: worldYSize, z: worldZSize, data: worldData)
+    var `name`* = Level[array[`worldSize`, uint8]](x: worldXSize, y: worldYSize,
+        z: worldZSize, data: worldData)
 
 proc intToTileType(x: uint8): Option[WorldTileType] =
   case x:
