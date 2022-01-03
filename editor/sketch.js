@@ -246,8 +246,7 @@ function exportWorld() {
   var output = `const worldXSize: int = ${WORLD_SIZE}<br/>`
   output += `const worldYSize: int = ${WORLD_SIZE}<br/>`
   output += `const worldZSize: int = ${WORLD_HEIGHT}<br/>`
-  output += `const worldSize: int = ${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}<br/>`
-  output += `const worldData: array[worldSize, uint8] = [`
+  output += `const worldData: array[${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}, uint8] = [`
   
   var firstTile = true;
 
