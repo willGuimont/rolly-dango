@@ -4,7 +4,11 @@ import cart/ecs/ecs
 import cart/components/spritecomponent
 import cart/components/positioncomponent
 import cart/components/worldtilecomponent
+import cart/components/inputcomponent
 import cart/assets/levels/testlevel
+import cart/input/gamepad
+import cart/input/wasm4gamepad
+import cart/systems/inputsystem
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
@@ -40,10 +44,14 @@ proc buildWorld() =
   reg.buildLevel(level)
 
   var dangoEntity = reg.newEntity()
-  var dangoSpriteComponent = SpriteComponent(sprite: dangoSprite)
+  var dangoSpriteComponent: SpriteComponent = SpriteComponent(
+      sprite: dangoSprite)
   var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 1)
+  var dangoInputComponent: InputComponent = InputComponent(
+      gamepad: Wasm4Gamepad(gamepad: GAMEPAD1[]))
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
+  reg.addComponent(dangoEntity, dangoInputComponent)
 
 proc start {.exportWasm.} =
   NimMain()
@@ -51,3 +59,4 @@ proc start {.exportWasm.} =
 
 proc update {.exportWasm.} =
   render(reg)
+  move(reg)
