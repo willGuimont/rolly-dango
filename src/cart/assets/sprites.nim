@@ -67,6 +67,6 @@ const slopeBack: array[64, uint8] = [0x00'u8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 makeSprite(dango)
 makeSprite(tile)
 makeSprite(slopeRight)
+makeSprite(slopeFront)
 makeSprite(slopeLeft)
 makeSprite(slopeBack)
-makeSprite(slopeFront)
