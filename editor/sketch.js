@@ -243,7 +243,12 @@ function draw() {
 }
 
 function exportWorld() {
-  var output = `const worldData: array[${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}, uint8] = [`
+  var output = `const worldXSize: int = ${WORLD_SIZE}<br/>`
+  output += `const worldYSize: int = ${WORLD_SIZE}<br/>`
+  output += `const worldZSize: int = ${WORLD_HEIGHT}<br/>`
+  output += `const worldSize: int = ${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}<br/>`
+  output += `const worldData: array[worldSize, uint8] = [`
+  
   var firstTile = true;
 
   for (let z = 0; z < WORLD_HEIGHT; z++) {
@@ -262,9 +267,7 @@ function exportWorld() {
     }
   }
   output += "]<br/>"
-  output += `const worldXSize: int = ${WORLD_SIZE}<br/>`
-  output += `const worldYSize: int = ${WORLD_SIZE}<br/>`
-  output += `const worldZSize: int = ${WORLD_HEIGHT}<br/>`
+
 
   select("#exported").html(output);
 }

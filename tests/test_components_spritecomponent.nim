@@ -13,9 +13,9 @@ const spriteTest: array[64, uint8] = [0x00'u8, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 makeSprite(spriteTest)
 
-suite "assets":
+suite "spritecomponent":
     test "makeSprite macro returns a sprite with right argument":
-        assert spriteTestSprite.width == spriteTestWidth
-        assert spriteTestSprite.height == spriteTestHeight
-        assert spriteTestSprite.flags == spriteTestFlags
-        assert spriteTestSprite.data[] == spriteTest
+        check spriteTestSprite.width == spriteTestWidth
+        check spriteTestSprite.height == spriteTestHeight
+        check spriteTestSprite.flags == spriteTestFlags
+        check spriteTestSprite.data[] == spriteTest

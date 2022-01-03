@@ -3,6 +3,8 @@ import cart/assets/sprites
 import cart/ecs/ecs
 import cart/components/spritecomponent
 import cart/components/positioncomponent
+import cart/components/worldtilecomponent
+import cart/assets/levels/testlevel
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
@@ -35,19 +37,11 @@ proc render(reg: Registry) {.exportWasm.} =
 
 proc buildWorld() =
   reg = newRegistry()
-  for i in 0..9:
-    for j in 0..9:
-      for k in 0..4:
-        let tileEntity1 = reg.newEntity()
-        let tileSpriteComponent1 = SpriteComponent(sprite: tileSprite)
-        let tilePositionComponent1: PositionComponent = PositionComponent(
-          x: uint8(i), y: uint8(j), z: uint8(k))
-        reg.addComponent(tileEntity1, tileSpriteComponent1)
-        reg.addComponent(tileEntity1, tilePositionComponent1)
+  reg.buildLevel(level)
 
   var dangoEntity = reg.newEntity()
   var dangoSpriteComponent = SpriteComponent(sprite: dangoSprite)
-  var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 5)
+  var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 1)
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
 

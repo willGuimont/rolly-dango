@@ -8,7 +8,7 @@ license = "MIT"
 srcDir = "src"
 
 # Dependencies
-# requires ""
+# requires "..."
 
 # Build
 let outFile = "build" / "cart.wasm"
