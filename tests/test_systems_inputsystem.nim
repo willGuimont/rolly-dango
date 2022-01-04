@@ -20,4 +20,4 @@ suite "inputsystem":
         processInput(reg)
 
         let (positionComponent) = reg.getComponents(testEntity, PositionComponent)
-        assert positionComponent.x == 0
+        assert positionComponent.x == 2

@@ -35,7 +35,7 @@ proc render(reg: Registry) {.exportWasm.} =
       let (spriteComponent, positionComponent) = reg.getComponents(entity,
           SpriteComponent, PositionComponent)
       let position = position_to_iso(positionComponent)
-      blit(spriteComponent.sprite.data,
+      blit(addr spriteComponent.sprite.data[][0],
           position.x, position.y,
           spriteComponent.sprite.width,
           spriteComponent.sprite.height, spriteComponent.sprite.flags)
