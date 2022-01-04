@@ -16,16 +16,15 @@ proc moveBack(positionComponent: PositionComponent) =
     positionComponent.y += 1
 
 proc processInput*(reg: Registry) =
-    if reg != nil:
-        for entity in reg.entitiesWith(InputComponent, PositionComponent):
-            let (inputComponent, positionComponent) = reg.getComponents(entity,
-                    InputComponent, PositionComponent)
+    for entity in reg.entitiesWith(InputComponent, PositionComponent):
+        let (inputComponent, positionComponent) = reg.getComponents(entity,
+                InputComponent, PositionComponent)
 
-            if inputComponent.gamepad.isLeft:
-                moveLeft(positionComponent)
-            elif inputComponent.gamepad.isRight:
-                moveRight(positionComponent)
-            elif inputComponent.gamepad.isFront:
-                moveFront(positionComponent)
-            elif inputComponent.gamepad.isBack:
-                moveBack(positionComponent)
+        if inputComponent.gamepad.isLeft:
+            moveLeft(positionComponent)
+        elif inputComponent.gamepad.isRight:
+            moveRight(positionComponent)
+        elif inputComponent.gamepad.isFront:
+            moveFront(positionComponent)
+        elif inputComponent.gamepad.isBack:
+            moveBack(positionComponent)

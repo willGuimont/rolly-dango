@@ -1,4 +1,4 @@
-import unittest
+import std/unittest
 import cart/ecs/ecs
 
 suite "ecs":

@@ -4,6 +4,7 @@ import cart/ecs/ecs
 import cart/components/spritecomponent
 import cart/components/positioncomponent
 import cart/components/worldtilecomponent
+import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/assets/levels/testlevel02
 import cart/input/gamepad
@@ -18,6 +19,7 @@ var reg: Registry
 var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
 var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
+var frameCount: int = 0
 
 proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   var iso_x: int32 = int32(position.x) * -decal.x + int32(position.y)*decal.x +
@@ -28,16 +30,14 @@ proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
 
 proc render(reg: Registry) {.exportWasm.} =
   DRAW_COLORS[] = 0x4320
-
-  if reg != nil:
-    for entity in reg.entitiesWith(SpriteComponent, PositionComponent):
-      let (spriteComponent, positionComponent) = reg.getComponents(entity,
-          SpriteComponent, PositionComponent)
-      let position = position_to_iso(positionComponent)
-      blit(addr spriteComponent.sprite.data[][0],
-          position.x, position.y,
-          spriteComponent.sprite.width,
-          spriteComponent.sprite.height, spriteComponent.sprite.flags)
+  for entity in reg.entitiesWith(SpriteComponent, PositionComponent):
+    let (spriteComponent, positionComponent) = reg.getComponents(entity,
+        SpriteComponent, PositionComponent)
+    let position = position_to_iso(positionComponent)
+    blit(addr spriteComponent.sprite.data[][0],
+        position.x, position.y,
+        spriteComponent.sprite.width,
+        spriteComponent.sprite.height, spriteComponent.sprite.flags)
 
 proc buildWorld() =
   reg = newRegistry()
@@ -46,18 +46,25 @@ proc buildWorld() =
   var dangoEntity = reg.newEntity()
   var dangoSpriteComponent: SpriteComponent = SpriteComponent(
       sprite: dangoSprite)
-  var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 1)
+  var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 5)
   var dangoInputComponent: InputComponent = InputComponent(
        gamepad: theGamepad)
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
   reg.addComponent(dangoEntity, dangoInputComponent)
+  reg.addComponent(dangoEntity, PhysicsComponent())
 
 proc start {.exportWasm.} =
   NimMain()
   buildWorld()
 
 proc update {.exportWasm.} =
+  frameCount.inc
+  if reg == nil:
+    return
+
   theGamepad.updateGamepad()
   render(reg)
   processInput(reg)
+  if (frameCount mod 60) == 0:
+    reg.physicsSystem()
