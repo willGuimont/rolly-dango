@@ -4,12 +4,16 @@ import cart/ecs/ecs
 import cart/components/spritecomponent
 import cart/components/positioncomponent
 import cart/components/worldtilecomponent
-import cart/assets/levels/testlevel
+import cart/components/inputcomponent
+import cart/assets/levels/testlevel02
+import cart/input/gamepad
+import cart/systems/inputsystem
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
 proc NimMain {.importc.}
 
+var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
 var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
@@ -23,31 +27,37 @@ proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   return (x: iso_x, y: isoY)
 
 proc render(reg: Registry) {.exportWasm.} =
-  DRAW_COLORS[] = 0x0320
+  DRAW_COLORS[] = 0x4320
 
   if reg != nil:
     for entity in reg.entitiesWith(SpriteComponent, PositionComponent):
       let (spriteComponent, positionComponent) = reg.getComponents(entity,
           SpriteComponent, PositionComponent)
       let position = position_to_iso(positionComponent)
-      blit(addr spriteComponent.sprite.data[0],
+      blit(addr spriteComponent.sprite.data[][0],
           position.x, position.y,
           spriteComponent.sprite.width,
           spriteComponent.sprite.height, spriteComponent.sprite.flags)
 
 proc buildWorld() =
   reg = newRegistry()
-  reg.buildLevel(level)
+  reg.buildLevel(level02)
 
   var dangoEntity = reg.newEntity()
-  var dangoSpriteComponent = SpriteComponent(sprite: dangoSprite)
+  var dangoSpriteComponent: SpriteComponent = SpriteComponent(
+      sprite: dangoSprite)
   var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 1)
+  var dangoInputComponent: InputComponent = InputComponent(
+       gamepad: theGamepad)
   reg.addComponent(dangoEntity, dangoSpriteComponent)
   reg.addComponent(dangoEntity, dangoPositionComponent)
+  reg.addComponent(dangoEntity, dangoInputComponent)
 
 proc start {.exportWasm.} =
   NimMain()
   buildWorld()
 
 proc update {.exportWasm.} =
+  theGamepad.updateGamepad()
   render(reg)
+  processInput(reg)

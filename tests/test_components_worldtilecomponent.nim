@@ -6,8 +6,7 @@ import cart/ecs/ecs
 const worldXSize: int = 10
 const worldYSize: int = 10
 const worldZSize: int = 5
-const worldSize: int = 500
-const worldData: array[worldSize, uint8] = [1'u8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+const worldData: array[500, uint8] = [1'u8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -29,7 +28,7 @@ const worldData: array[worldSize, uint8] = [1'u8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-makeLevel(aLevel, worldSize)
+makeLevel(aLevel)
 
 proc notAir(x: uint8): int =
     return if x != 0: 1 else: 0
