@@ -1,7 +1,7 @@
 import ../ecs/ecs
 import ../components/inputcomponent
 import ../components/positioncomponent
-import ../input/wasm4gamepad
+import ../input/gamepad
 
 proc moveLeft(positionComponent: PositionComponent) =
     positionComponent.x += 1
