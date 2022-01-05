@@ -77,3 +77,15 @@ suite "physiccomponent":
         topic.sendMessage(mmMoveFront)
 
         check phy.eventQueue.messages.len() == 1
+
+    test "rolling on flat tile decrease velocity":
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 1, 1, 0)
+
+        reg.makeTileAt(0, 0, 0)
+        reg.makeTileAt(1, 0, 0)
+
+        reg.physicsSystem()
+
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        check phy.velocity.x == 0
