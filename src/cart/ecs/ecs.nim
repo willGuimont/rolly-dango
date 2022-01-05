@@ -3,6 +3,7 @@ import std/packedsets
 import std/hashes
 import std/sequtils
 import std/macros
+import std/sugar
 
 type
   Entity* = uint32
@@ -100,8 +101,7 @@ macro hasAllComponents*(reg: Registry, entity: Entity, componentTypes: varargs[
 
 macro entitiesWith*(reg: Registry, componentTypes: varargs[untyped]): untyped =
   result = quote do:
-    filter(`reg`.allEntities, proc(
-        e: Entity): bool = `reg`.hasAllComponents(e, `componentTypes`))
+    filter(`reg`.allEntities, e => `reg`.hasAllComponents(e, `componentTypes`))
 
 macro makeComponentTypes(componentTypes: varargs[untyped]): untyped =
   var tuplesElements: seq[NimNode] = @[]
@@ -112,6 +112,5 @@ macro makeComponentTypes(componentTypes: varargs[untyped]): untyped =
 macro entitiesWithComponents*(reg: Registry, componentTypes: varargs[
     untyped]): untyped =
   result = quote do:
-    map(`reg`.entitiesWith(`componentTypes`), proc(
-        e: Entity): makeComponentTypes(`componentTypes`) = `reg`.getComponents(
-        e, `componentTypes`))
+    map(`reg`.entitiesWith(`componentTypes`), e => `reg`.getComponents(e,
+        `componentTypes`))
