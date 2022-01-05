@@ -8,7 +8,7 @@ proc makePhysicalAt(reg: var Registry, x: int8, y: int8, z: int8, dx: int8 = 0,
         dy: int8 = 0): Entity =
     result = reg.newEntity()
     reg.addComponent(result, PositionComponent(x: x, y: y, z: z))
-    reg.addComponent(result, PhysicsComponent(velocity: (x: dx, y: dy)))
+    reg.addComponent(result, PhysicsComponent(velocity: Velocity(x: dx, y: dy)))
 
 proc makeFloorAt(reg: var Registry, x: int8, y: int8, z: int8) =
     let floor = reg.newEntity()

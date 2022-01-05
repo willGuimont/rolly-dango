@@ -6,7 +6,7 @@ import cart/components/positioncomponent
 import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
-import cart/assets/levels/testlevel02
+import cart/assets/levels/testlevel03
 import cart/input/gamepad
 import cart/systems/inputsystem
 
@@ -41,18 +41,13 @@ proc render(reg: Registry) {.exportWasm.} =
 
 proc buildWorld() =
   reg = newRegistry()
-  reg.buildLevel(level02)
+  reg.buildLevel(level03)
 
   var dangoEntity = reg.newEntity()
-  var dangoSpriteComponent: SpriteComponent = SpriteComponent(
-      sprite: dangoSprite)
-  var dangoPositionComponent: PositionComponent = PositionComponent(x: 0, y: 0, z: 5)
-  var dangoInputComponent: InputComponent = InputComponent(
-       gamepad: theGamepad)
-  reg.addComponent(dangoEntity, dangoSpriteComponent)
-  reg.addComponent(dangoEntity, dangoPositionComponent)
-  reg.addComponent(dangoEntity, dangoInputComponent)
-  reg.addComponent(dangoEntity, PhysicsComponent())
+  reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
+  reg.addComponent(dangoEntity, PositionComponent(x: 4, y: 4, z: 2))
+  reg.addComponent(dangoEntity, InputComponent(gamepad: theGamepad))
+  reg.addComponent(dangoEntity, PhysicsComponent(velocity: Velocity(x: 0, y: 0)))
 
 proc start {.exportWasm.} =
   NimMain()
