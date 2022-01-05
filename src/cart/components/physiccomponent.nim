@@ -3,8 +3,11 @@ import ../events/eventqueue
 import ../ecs/ecs
 import ../components/positioncomponent
 import ../components/worldtilecomponent
+import std/math
 
 type
+    Direction* = enum
+        dNone, dRight, dFront, dLeft, dBack
     Velocity* = object
         x*: int8
         y*: int8
@@ -23,6 +26,32 @@ proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
             return some(e)
     return none(Entity)
 
+proc getDirection(vel: Velocity): Direction =
+    #For now we only consider 4 directions
+    if vel.x == 0 and vel.y > 0:
+        return Direction.dRight
+    if vel.x > 0 and vel.y == 0:
+        return Direction.dFront
+    if vel.x == 0 and vel.y < 0:
+        return Direction.dLeft
+    if vel.x < 0 and vel.y == 0:
+        return Direction.dBack
+    if vel.x == 0 and vel.y == 0:
+        return Direction.dNone
+
+proc tileFriction(phy: PhysicsComponent): Velocity =
+    case getDirection(phy.velocity)
+    of Direction.dRight:
+        return Velocity(x: 0, y: -1)
+    of Direction.dFront:
+        return Velocity(x: -1, y: 0)
+    of Direction.dLeft:
+        return Velocity(x: 0, y: 1)
+    of Direction.dBack:
+        return Velocity(x: 1, y: 0)
+    else:
+        return Velocity(x: 0, y: 0)
+
 proc getTileVelocity(tile: WorldTileComponent): Velocity =
     case tile.tileType
     of WorldTileType.wttSlopeRight:
@@ -36,11 +65,30 @@ proc getTileVelocity(tile: WorldTileComponent): Velocity =
     else:
         return Velocity(x: 0, y: 0)
 
+proc processTileFriction(reg: Registry, pos: PositionComponent,
+        phy: PhysicsComponent) =
+    let entityUnder = reg.standingOn(pos)
+    if entityUnder.isSome():
+        if reg.getComponent[:WorldTileComponent](entityUnder.get()).tileType ==
+                WorldTileType.wttTile:
+            let vel = tileFriction(phy)
+            phy.velocity.x += vel.x
+            phy.velocity.y += vel.y
+
+
+proc processGravity(reg: Registry, pos: PositionComponent) =
+    let entityUnder = reg.standingOn(pos)
+    if entityUnder.isNone():
+        pos.z.dec
+
 proc physicsSystem*(reg: Registry) =
     for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
             PhysicsComponent):
-        pos.x += phy.velocity.x
-        pos.y += phy.velocity.y
+        pos.x += int8(sgn(phy.velocity.x))
+        pos.y += int8(sgn(phy.velocity.y))
+
+        processTileFriction(reg, pos, phy)
+        processGravity(reg, pos)
         let entityUnder = reg.standingOn(pos)
         if entityUnder.isSome():
             let entity = entityUnder.get()
@@ -49,5 +97,4 @@ proc physicsSystem*(reg: Registry) =
                         WorldTileComponent](entity))
                 phy.velocity.x += velDelta.x
                 phy.velocity.y += velDelta.y
-        else:
-            pos.z.dec
+
