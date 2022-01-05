@@ -9,7 +9,7 @@ type
   WorldTileType* = enum
     wttTile, wttSlopeLeft, wttSlopeRight, wttSlopeFront, wttSlopeBack
   WorldTileComponent* = ref object of Component
-    worldTile*: WorldTileType
+    tileType*: WorldTileType
   Level*[T] = object
     x: int
     y: int
@@ -58,4 +58,4 @@ proc buildLevel*[T](reg: Registry, level: Level[T]) =
           var e = reg.newEntity()
           reg.addComponent(e, SpriteComponent(sprite: oSprite.get()))
           reg.addComponent(e, PositionComponent(x: int8(i), y: int8(j), z: int8(k)))
-          reg.addComponent(e, WorldTileComponent(worldTile: tt))
+          reg.addComponent(e, WorldTileComponent(tileType: tt))

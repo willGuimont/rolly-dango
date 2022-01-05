@@ -52,7 +52,7 @@ proc countOf(reg: Registry, t: WorldTileType): int =
     result = 0
     for e in reg.entitiesWith(WorldTileComponent):
         let c = reg.getComponent[:WorldTileComponent](e)
-        if c.worldTile == t:
+        if c.tileType == t:
             result.inc
 
 suite "worldtilecomponent":
