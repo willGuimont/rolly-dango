@@ -1,5 +1,6 @@
 import std/unittest
 import cart/ecs/ecs
+import cart/events/eventqueue
 import cart/components/physiccomponent
 import cart/components/positioncomponent
 import cart/components/worldtilecomponent
@@ -8,7 +9,8 @@ proc makePhysicalEntityAt(reg: var Registry, x: int8, y: int8, z: int8,
         dx: int8 = 0, dy: int8 = 0): Entity =
     result = reg.newEntity()
     reg.addComponent(result, PositionComponent(x: x, y: y, z: z))
-    reg.addComponent(result, PhysicsComponent(velocity: Velocity(x: dx, y: dy)))
+    reg.addComponent(result, PhysicsComponent(velocity: Velocity(x: dx, y: dy),
+            eventQueue: MovementEventQueue()))
 
 proc makeTileAt(reg: var Registry, x: int8, y: int8, z: int8,
         tileType: WorldTileType = wttTile) =
@@ -66,5 +68,12 @@ suite "physiccomponent":
         check phy.velocity.x == 1
 
     test "can receive movement messages":
-        check true
-        # TODO
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 2, 1, 0)
+        var topic = newTopic[MovementMessage]()
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        phy.eventQueue.followTopic(topic)
+
+        topic.sendMessage(mmMoveFront)
+
+        check phy.eventQueue.messages.len() == 1

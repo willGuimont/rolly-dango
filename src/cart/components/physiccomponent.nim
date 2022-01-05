@@ -9,11 +9,12 @@ type
         x*: int8
         y*: int8
     MovementMessage* = enum mmMoveRight, mmMoveFront, mmMoveLeft, mmMoveBack
+    # TODO make macro to generate constructor for topics and event queue
     MovementTopic = Topic[MovementMessage]
-    MovementEventQueue = EventQueue[MovementMessage]
+    MovementEventQueue* = EventQueue[MovementMessage]
     PhysicsComponent* = ref object of Component
         velocity*: Velocity
-        eventQueue: MovementEventQueue
+        eventQueue*: MovementEventQueue
 
 proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
     for e in reg.entitiesWith(PositionComponent, WorldTileComponent):
