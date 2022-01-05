@@ -6,7 +6,7 @@ import cart/components/positioncomponent
 import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
-import cart/assets/levels/testlevel04
+import cart/assets/levels/testlevel05
 import cart/input/gamepad
 import cart/systems/inputsystem
 
@@ -41,7 +41,7 @@ proc render(reg: Registry) {.exportWasm.} =
 
 proc buildWorld() =
   reg = newRegistry()
-  reg.buildLevel(level04)
+  reg.buildLevel(level05)
 
   var dangoEntity = reg.newEntity()
   reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
