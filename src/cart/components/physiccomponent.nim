@@ -16,7 +16,6 @@ type
     MovementEventQueue* = EventQueue[MovementMessage]
     PhysicsComponent* = ref object of Component
         velocity*: Velocity
-        direction*: Direction
         eventQueue*: MovementEventQueue
 
 proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
@@ -26,8 +25,21 @@ proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
             return some(e)
     return none(Entity)
 
+proc getDirection(vel: Velocity): Direction =
+    #For now we only consider 4 directions
+    if vel.x == 0 and vel.y > 0:
+        return Direction.dRight
+    if vel.x > 0 and vel.y == 0:
+        return Direction.dFront
+    if vel.x == 0 and vel.y < 0:
+        return Direction.dLeft
+    if vel.x < 0 and vel.y == 0:
+        return Direction.dBack
+    if vel.x == 0 and vel.y == 0:
+        return Direction.dNone
+
 proc tileFriction(phy: PhysicsComponent): Velocity =
-    case phy.direction
+    case getDirection(phy.velocity)
     of Direction.dRight:
         return Velocity(x: 0, y: -1)
     of Direction.dFront:
@@ -55,23 +67,9 @@ proc getTileVelocity(tile: WorldTileComponent,
     else:
         return Velocity(x: 0, y: 0)
 
-proc getDirection(vel: Velocity): Direction =
-    #For now we only consider 4 directions
-    if vel.x == 0 and vel.y > 0:
-        return Direction.dRight
-    if vel.x > 0 and vel.y == 0:
-        return Direction.dFront
-    if vel.x == 0 and vel.y < 0:
-        return Direction.dLeft
-    if vel.x < 0 and vel.y == 0:
-        return Direction.dBack
-    if vel.x == 0 and vel.y == 0:
-        return Direction.dNone
-
 proc physicsSystem*(reg: Registry) =
     for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
             PhysicsComponent):
-        phy.direction = getDirection(phy.velocity)
         pos.x += phy.velocity.x
         pos.y += phy.velocity.y
         let entityUnder = reg.standingOn(pos)

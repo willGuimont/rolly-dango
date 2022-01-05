@@ -89,3 +89,21 @@ suite "physiccomponent":
 
         let phy = reg.getComponent[:PhysicsComponent](entity)
         check phy.velocity.x == 0
+
+    test "Move down many slope with increased velocity":
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 3, 0, 0)
+
+        reg.makeTileAt(0, 0, 2, wttSlopeFront)
+        reg.makeTileAt(1, 0, 1, wttSlopeFront)
+        reg.makeTileAt(2, 0, 0)
+
+        reg.physicsSystem()
+        reg.physicsSystem()
+        reg.physicsSystem()
+
+        let pos = reg.getComponent[:PositionComponent](entity)
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        check pos.x == 2
+        check pos.z == 1
+        check phy.velocity.x == 2
