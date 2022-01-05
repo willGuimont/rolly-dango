@@ -3,6 +3,7 @@ import ../events/eventqueue
 import ../ecs/ecs
 import ../components/positioncomponent
 import ../components/worldtilecomponent
+import std/math
 
 type
     Direction* = enum
@@ -80,18 +81,11 @@ proc processGravity(reg: Registry, pos: PositionComponent) =
     if entityUnder.isNone():
         pos.z.dec
 
-proc sign(value: int8): int8 =
-    if value > 0:
-        return 1
-    if value < 0:
-        return -1
-    return 0
-
 proc physicsSystem*(reg: Registry) =
     for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
             PhysicsComponent):
-        pos.x += sign(phy.velocity.x)
-        pos.y += sign(phy.velocity.y)
+        pos.x += int8(sgn(phy.velocity.x))
+        pos.y += int8(sgn(phy.velocity.y))
 
         processTileFriction(reg, pos, phy)
         processGravity(reg, pos)
