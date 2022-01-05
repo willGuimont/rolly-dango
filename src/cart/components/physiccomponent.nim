@@ -51,8 +51,7 @@ proc tileFriction(phy: PhysicsComponent): Velocity =
     else:
         return Velocity(x: 0, y: 0)
 
-proc getTileVelocity(tile: WorldTileComponent,
-        phy: PhysicsComponent): Velocity =
+proc getTileVelocity(tile: WorldTileComponent): Velocity =
     case tile.tileType
     of WorldTileType.wttSlopeRight:
         return Velocity(x: 0, y: 1)
@@ -62,23 +61,46 @@ proc getTileVelocity(tile: WorldTileComponent,
         return Velocity(x: 0, y: -1)
     of WorldTileType.wttSlopeBack:
         return Velocity(x: -1, y: 0)
-    of WorldTileType.wttTile:
-        return tileFriction(phy)
     else:
         return Velocity(x: 0, y: 0)
+
+proc processTileFriction(reg: Registry, pos: PositionComponent,
+        phy: PhysicsComponent) =
+    let entityUnder = reg.standingOn(pos)
+    if entityUnder.isSome():
+        if reg.getComponent[:WorldTileComponent](entityUnder.get()).tileType ==
+                WorldTileType.wttTile:
+            let vel = tileFriction(phy)
+            phy.velocity.x += vel.x
+            phy.velocity.y += vel.y
+
+
+proc processGravity(reg: Registry, pos: PositionComponent) =
+    let entityUnder = reg.standingOn(pos)
+    if entityUnder.isNone():
+        pos.z.dec
+
+proc sign(value: int8): int8 =
+    if value > 0:
+        return 1
+    if value < 0:
+        return -1
+    return 0
 
 proc physicsSystem*(reg: Registry) =
     for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
             PhysicsComponent):
-        pos.x += phy.velocity.x
-        pos.y += phy.velocity.y
+        pos.x += sign(phy.velocity.x)
+        pos.y += sign(phy.velocity.y)
+
+        processTileFriction(reg, pos, phy)
+        processGravity(reg, pos)
         let entityUnder = reg.standingOn(pos)
         if entityUnder.isSome():
             let entity = entityUnder.get()
             if reg.hasComponent[:WorldTileComponent](entity):
                 let velDelta = getTileVelocity(reg.getComponent[:
-                        WorldTileComponent](entity), phy)
+                        WorldTileComponent](entity))
                 phy.velocity.x += velDelta.x
                 phy.velocity.y += velDelta.y
-        else:
-            pos.z.dec
+
