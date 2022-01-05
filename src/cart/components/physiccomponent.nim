@@ -1,4 +1,5 @@
 import std/options
+import ../events/eventqueue
 import ../ecs/ecs
 import ../components/positioncomponent
 import ../components/worldtilecomponent
@@ -7,8 +8,13 @@ type
     Velocity* = object
         x*: int8
         y*: int8
+    MovementMessage* = enum mmMoveRight, mmMoveFront, mmMoveLeft, mmMoveBack
+    # TODO make macro to generate constructor for topics and event queue
+    MovementTopic = Topic[MovementMessage]
+    MovementEventQueue* = EventQueue[MovementMessage]
     PhysicsComponent* = ref object of Component
         velocity*: Velocity
+        eventQueue*: MovementEventQueue
 
 proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
     for e in reg.entitiesWith(PositionComponent, WorldTileComponent):
@@ -17,8 +23,8 @@ proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
             return some(e)
     return none(Entity)
 
-proc getTileVelocity(worldTile: WorldTileComponent): Velocity =
-    case worldTile.worldTile
+proc getTileVelocity(tile: WorldTileComponent): Velocity =
+    case tile.tileType
     of WorldTileType.wttSlopeRight:
         return Velocity(x: 0, y: 1)
     of WorldTileType.wttSlopeFront:

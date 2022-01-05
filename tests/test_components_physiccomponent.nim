@@ -1,24 +1,27 @@
 import std/unittest
 import cart/ecs/ecs
+import cart/events/eventqueue
 import cart/components/physiccomponent
 import cart/components/positioncomponent
 import cart/components/worldtilecomponent
 
-proc makePhysicalAt(reg: var Registry, x: int8, y: int8, z: int8, dx: int8 = 0,
-        dy: int8 = 0): Entity =
+proc makePhysicalEntityAt(reg: var Registry, x: int8, y: int8, z: int8,
+        dx: int8 = 0, dy: int8 = 0): Entity =
     result = reg.newEntity()
     reg.addComponent(result, PositionComponent(x: x, y: y, z: z))
-    reg.addComponent(result, PhysicsComponent(velocity: Velocity(x: dx, y: dy)))
+    reg.addComponent(result, PhysicsComponent(velocity: Velocity(x: dx, y: dy),
+            eventQueue: MovementEventQueue()))
 
-proc makeFloorAt(reg: var Registry, x: int8, y: int8, z: int8) =
+proc makeTileAt(reg: var Registry, x: int8, y: int8, z: int8,
+        tileType: WorldTileType = wttTile) =
     let floor = reg.newEntity()
     reg.addComponent(floor, PositionComponent(x: x, y: y, z: z))
-    reg.addComponent(floor, WorldTileComponent(worldTile: wttTile))
+    reg.addComponent(floor, WorldTileComponent(tileType: tileType))
 
 suite "physiccomponent":
     test "entity can fall":
         var reg = newRegistry()
-        let entity = reg.makePhysicalAt(0, 0, 2)
+        let entity = reg.makePhysicalEntityAt(0, 0, 2)
 
         reg.physicsSystem()
 
@@ -27,8 +30,8 @@ suite "physiccomponent":
 
     test "the fall is stopped by floor":
         var reg = newRegistry()
-        let entity = reg.makePhysicalAt(0, 0, 3)
-        reg.makeFloorAt(0, 0, 1)
+        let entity = reg.makePhysicalEntityAt(0, 0, 3)
+        reg.makeTileAt(0, 0, 1)
 
         reg.physicsSystem()
         reg.physicsSystem()
@@ -39,12 +42,38 @@ suite "physiccomponent":
 
     test "velocity make move the entity":
         var reg = newRegistry()
-        let entity = reg.makePhysicalAt(0, 0, 1, 1, 0)
+        let entity = reg.makePhysicalEntityAt(0, 0, 1, 1, 0)
 
-        reg.makeFloorAt(0, 0, 0)
-        reg.makeFloorAt(1, 0, 0)
+        reg.makeTileAt(0, 0, 0)
+        reg.makeTileAt(1, 0, 0)
 
         reg.physicsSystem()
 
         let pos = reg.getComponent[:PositionComponent](entity)
         check pos.x == 1
+
+    test "moves down slope with velocity":
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 2, 1, 0)
+
+        reg.makeTileAt(0, 0, 1, wttSlopeFront)
+        reg.makeTileAt(1, 0, 0)
+
+        reg.physicsSystem()
+
+        let pos = reg.getComponent[:PositionComponent](entity)
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        check pos.x == 1
+        check pos.z == 1
+        check phy.velocity.x == 1
+
+    test "can receive movement messages":
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 2, 1, 0)
+        var topic = newTopic[MovementMessage]()
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        phy.eventQueue.followTopic(topic)
+
+        topic.sendMessage(mmMoveFront)
+
+        check phy.eventQueue.messages.len() == 1

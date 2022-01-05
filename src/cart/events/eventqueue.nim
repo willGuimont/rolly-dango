@@ -1,5 +1,5 @@
 import std/options
-import cart/events/pubsub
+import ../events/pubsub
 
 type
   EventQueue*[T] = ref object
