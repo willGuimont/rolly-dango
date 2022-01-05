@@ -5,6 +5,7 @@ import ../components/worldtilecomponent
 
 type
     PhysicsComponent* = ref object of Component
+        velocity*: tuple[x: int8, y: int8]
 
 proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
     for e in reg.entitiesWith(PositionComponent, WorldTileComponent):
@@ -14,8 +15,10 @@ proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
     return none(Entity)
 
 proc physicsSystem*(reg: Registry) =
-    for (pos, _) in reg.entitiesWithComponents(PositionComponent,
+    for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
             PhysicsComponent):
+        pos.x += phy.velocity.x
+        pos.y += phy.velocity.y
         let entityUnder = reg.standingOn(pos)
         if entityUnder.isNone():
             pos.z.dec

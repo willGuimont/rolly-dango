@@ -57,6 +57,5 @@ proc buildLevel*[T](reg: Registry, level: Level[T]) =
           let tt = ott.get()
           var e = reg.newEntity()
           reg.addComponent(e, SpriteComponent(sprite: oSprite.get()))
-          reg.addComponent(e, PositionComponent(x: uint8(i), y: uint8(j),
-              z: uint8(k)))
+          reg.addComponent(e, PositionComponent(x: int8(i), y: int8(j), z: int8(k)))
           reg.addComponent(e, WorldTileComponent(worldTile: tt))

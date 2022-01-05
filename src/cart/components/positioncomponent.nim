@@ -2,6 +2,6 @@ import ../ecs/ecs
 
 type
    PositionComponent* = ref object of Component
-      x*: uint8
-      y*: uint8
-      z*: uint8
+      x*: int8
+      y*: int8
+      z*: int8
