@@ -103,12 +103,6 @@ macro entitiesWith*(reg: Registry, componentTypes: varargs[untyped]): untyped =
   result = quote do:
     filter(`reg`.allEntities, e => `reg`.hasAllComponents(e, `componentTypes`))
 
-macro makeComponentTypes(componentTypes: varargs[untyped]): untyped =
-  var tuplesElements: seq[NimNode] = @[]
-  for c in componentTypes:
-    tuplesElements.add(ident($c))
-  result = nnkTupleConstr.newTree(tuplesElements)
-
 macro entitiesWithComponents*(reg: Registry, componentTypes: varargs[
     untyped]): untyped =
   result = quote do:

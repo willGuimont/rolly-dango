@@ -6,9 +6,9 @@ import cart/components/positioncomponent
 import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
-import cart/assets/levels/testlevel04
+import cart/assets/levels/testlevel03
 import cart/input/gamepad
-import cart/systems/inputsystem
+import cart/events/eventqueue
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
@@ -41,13 +41,18 @@ proc render(reg: Registry) {.exportWasm.} =
 
 proc buildWorld() =
   reg = newRegistry()
-  reg.buildLevel(level04)
+  reg.buildLevel(tlevel03)
 
   var dangoEntity = reg.newEntity()
+  var inputTopic = newTopic[MovementMessage]()
+  let phyComponent = PhysicsComponent(velocity: Velocity(x: 0, y: 0),
+                  eventQueue: newEventQueue[MovementMessage]())
+  phyComponent.eventQueue.followTopic(inputTopic)
   reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
-  reg.addComponent(dangoEntity, PositionComponent(x: 0, y: 0, z: 6))
-  reg.addComponent(dangoEntity, InputComponent(gamepad: theGamepad))
-  reg.addComponent(dangoEntity, PhysicsComponent(velocity: Velocity(x: 0, y: 0)))
+  reg.addComponent(dangoEntity, PositionComponent(x: 4, y: 4, z: 2))
+  reg.addComponent(dangoEntity, InputComponent(gamepad: theGamepad,
+      physicTopic: inputTopic))
+  reg.addComponent(dangoEntity, phyComponent)
 
 proc start {.exportWasm.} =
   NimMain()
@@ -61,5 +66,5 @@ proc update {.exportWasm.} =
   theGamepad.updateGamepad()
   render(reg)
   processInput(reg)
-  if (frameCount mod 60) == 0:
+  if (frameCount mod 30) == 0:
     reg.physicsSystem()

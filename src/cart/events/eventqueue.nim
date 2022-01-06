@@ -16,6 +16,9 @@ proc popMessage*[T](queue: EventQueue[T]): Option[T] =
   else:
     result = none(T)
 
+proc clearQueue*[T](queue: EventQueue[T]) =
+  queue.queue = @[]
+
 proc newTopic*[T](): Topic[T] =
   result = Topic[T]()
 

@@ -71,3 +71,14 @@ suite "eventqueue":
     check queue.popMessage == some(aMessage)
     check queue.popMessage == some(anotherMessage)
     check queue.popMessage == none(MessageType)
+
+  test "can clear all messages":
+    var topic = newTopic[MessageType]()
+    var queue = newEventQueue[MessageType]()
+    queue.followTopic(topic)
+    topic.sendMessage(aMessage)
+    topic.sendMessage(anotherMessage)
+
+    queue.clearQueue()
+
+    check queue.messages.len() == 0

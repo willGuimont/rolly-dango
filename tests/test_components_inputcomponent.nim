@@ -1,9 +1,10 @@
 import std/unittest
-import cart/systems/inputsystem
-import cart/input/gamepad
-import cart/components/positioncomponent
 import cart/components/inputcomponent
+import cart/components/positioncomponent
+import cart/components/physiccomponent
+import cart/input/gamepad
 import cart/ecs/ecs
+import cart/events/eventqueue
 
 suite "inputsystem":
     test "when gamepad presses left, move entity to the left":
@@ -12,11 +13,15 @@ suite "inputsystem":
         var testEntity = reg.newEntity()
         var testPositionComponent: PositionComponent = PositionComponent(x: 1,
                 y: 0, z: 0)
+        var topic = newTopic[MovementMessage]()
+        var queue = newEventQueue[MovementMessage]()
+        queue.followTopic(topic)
         var testInputComponent: InputComponent = InputComponent(
-            gamepad: getNewGamepad(uint8(0b000010000)))
+                gamepad: getNewGamepad(uint8(0b000010000)), physicTopic: topic)
+
         reg.addComponent(testEntity, testPositionComponent)
         reg.addComponent(testEntity, testInputComponent)
-        processInput(reg)
 
-        let (positionComponent) = reg.getComponents(testEntity, PositionComponent)
-        assert positionComponent.x == 2
+        reg.processInput()
+
+        check queue.messages()[0] == mmMoveLeft
