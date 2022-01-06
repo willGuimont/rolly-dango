@@ -66,5 +66,5 @@ proc update {.exportWasm.} =
   theGamepad.updateGamepad()
   render(reg)
   processInput(reg)
-  if (frameCount mod 60) == 0:
+  if (frameCount mod 30) == 0:
     reg.physicsSystem()
