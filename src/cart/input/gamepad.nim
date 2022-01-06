@@ -20,7 +20,7 @@ proc isRight*(theGamepad: Gamepad): bool =
     return bool(theGamepad.gamepad and BUTTON_RIGHT)
 
 proc isFront*(theGamepad: Gamepad): bool =
-    return bool(theGamepad.gamepad and BUTTON_UP)
+    return bool(theGamepad.gamepad and BUTTON_DOWN)
 
 proc isBack*(theGamepad: Gamepad): bool =
-    return bool(theGamepad.gamepad and BUTTON_DOWN)
+    return bool(theGamepad.gamepad and BUTTON_UP)
