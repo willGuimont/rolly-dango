@@ -8,6 +8,7 @@ import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/assets/levels/testlevel05
 import cart/input/gamepad
+import cart/events/eventqueue
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
@@ -43,10 +44,15 @@ proc buildWorld() =
   reg.buildLevel(level05)
 
   var dangoEntity = reg.newEntity()
+  var inputTopic = newTopic[MovementMessage]()
+  let phyComponent = PhysicsComponent(velocity: Velocity(x: 0, y: 0),
+                  eventQueue: newEventQueue[MovementMessage]())
+  phyComponent.eventQueue.followTopic(inputTopic)
   reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
   reg.addComponent(dangoEntity, PositionComponent(x: 0, y: 0, z: 6))
-  reg.addComponent(dangoEntity, InputComponent(gamepad: theGamepad))
-  reg.addComponent(dangoEntity, PhysicsComponent(velocity: Velocity(x: 0, y: 0)))
+  reg.addComponent(dangoEntity, InputComponent(gamepad: theGamepad,
+      physicTopic: inputTopic))
+  reg.addComponent(dangoEntity, phyComponent)
 
 proc start {.exportWasm.} =
   NimMain()

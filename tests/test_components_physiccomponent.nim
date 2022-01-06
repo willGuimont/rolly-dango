@@ -137,3 +137,19 @@ suite "physiccomponent":
         check pos.x == 0
         check pos.z == 1
         check phy.velocity.x == 0
+
+    test "Moves on movement event":
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 1)
+        var topic = newTopic[MovementMessage]()
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        phy.eventQueue.followTopic(topic)
+        topic.sendMessage(mmMoveFront)
+
+        reg.makeTileAt(0, 0, 0)
+        reg.makeTileAt(1, 0, 0)
+
+        reg.physicsSystem()
+
+        let pos = reg.getComponent[:PositionComponent](entity)
+        check pos.x == 1
