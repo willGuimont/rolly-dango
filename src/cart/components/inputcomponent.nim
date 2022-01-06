@@ -2,20 +2,18 @@ import ../ecs/ecs
 import ../input/gamepad
 import ../components/physiccomponent
 import ../events/eventqueue
-import ../wasm4
 
 type InputComponent* = ref object of Component
     gamepad*: Gamepad
-    physicTopic: MovementTopic
+    physicTopic*: MovementTopic
 
 proc processInput*(reg: Registry) =
-    for (inputCompoment) in reg.entitiesWithComponents(InputComponent):
-        trace($typeof(inputCompoment))
-        if inputComponent.gamepad.isLeft():
-            echo "a"
-                # elif inputComponent.gamepad.isRight():
-                #     echo "a"
-                # elif inputComponent.gamepad.isFront():
-                #     echo "a"
-                # elif inputComponent.gamepad.isBack():
-                #     echo "a"
+    for (ic) in reg.entitiesWithComponents(InputComponent):
+        if ic.gamepad.isLeft():
+            ic.physicTopic.sendMessage(mmMoveLeft)
+        elif ic.gamepad.isRight():
+            ic.physicTopic.sendMessage(mmMoveRight)
+        elif ic.gamepad.isFront():
+            ic.physicTopic.sendMessage(mmMoveFront)
+        elif ic.gamepad.isBack():
+            ic.physicTopic.sendMessage(mmMoveBack)
