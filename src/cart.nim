@@ -6,7 +6,7 @@ import cart/components/positioncomponent
 import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
-import cart/assets/levels/testlevel03
+import cart/assets/levels/testlevel04
 import cart/input/gamepad
 import cart/events/eventqueue
 
@@ -41,7 +41,7 @@ proc render(reg: Registry) {.exportWasm.} =
 
 proc buildWorld() =
   reg = newRegistry()
-  reg.buildLevel(tlevel03)
+  reg.buildLevel(tlevel04)
 
   var dangoEntity = reg.newEntity()
   var inputTopic = newTopic[MovementMessage]()
@@ -49,7 +49,7 @@ proc buildWorld() =
                   eventQueue: newEventQueue[MovementMessage]())
   phyComponent.eventQueue.followTopic(inputTopic)
   reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
-  reg.addComponent(dangoEntity, PositionComponent(x: 4, y: 4, z: 2))
+  reg.addComponent(dangoEntity, PositionComponent(x: 3, y: 0, z: 4))
   reg.addComponent(dangoEntity, InputComponent(gamepad: theGamepad,
       physicTopic: inputTopic))
   reg.addComponent(dangoEntity, phyComponent)
