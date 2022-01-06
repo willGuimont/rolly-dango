@@ -118,3 +118,17 @@ suite "ecs":
 
     check (component1, component2) == foundEntities[0]
     check (component1, component2) == foundEntities[1]
+
+  test "can iterate on entities one component":
+    var reg = newRegistry()
+    var entity1 = reg.newEntity()
+    var entity2 = reg.newEntity()
+    var entity3 = reg.newEntity()
+    var component = TestComponent(x: 1, y: 2)
+    reg.addComponent(entity1, component)
+    reg.addComponent(entity3, component)
+
+    let foundEntities = reg.entitiesWithComponents(TestComponent)
+
+    check (component, ) == foundEntities[0]
+    check (component, ) == foundEntities[1]

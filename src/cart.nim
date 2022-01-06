@@ -8,7 +8,6 @@ import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/assets/levels/testlevel05
 import cart/input/gamepad
-import cart/systems/inputsystem
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
