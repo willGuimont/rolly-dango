@@ -130,26 +130,25 @@ proc processVelocityMovement(reg: Registry, pos: PositionComponent,
 
 proc processEventQueue(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
-    let m = phy.eventQueue.popMessage()
-    if m.isSome():
-        case (m.get())
-        of mmMoveBack:
-            moveOneTile(reg, pos, phy, dBack)
-        of mmMoveFront:
-            moveOneTile(reg, pos, phy, dFront)
-        of mmMoveLeft:
-            moveOneTile(reg, pos, phy, dLeft)
-        of mmMoveRight:
-            moveOneTile(reg, pos, phy, dRight)
-        phy.eventQueue.clearQueue()
+    let direction = getDirection(phy.velocity)
+    if direction == dNone and reg.standingOn(pos).isSome():
+        let m = phy.eventQueue.popMessage()
+        if m.isSome():
+            case (m.get())
+            of mmMoveBack:
+                moveOneTile(reg, pos, phy, dBack)
+            of mmMoveFront:
+                moveOneTile(reg, pos, phy, dFront)
+            of mmMoveLeft:
+                moveOneTile(reg, pos, phy, dLeft)
+            of mmMoveRight:
+                moveOneTile(reg, pos, phy, dRight)
 
 proc processMovement(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
-    if getDirection(phy.velocity) != dNone:
-        reg.processVelocityMovement(pos, phy)
-        phy.eventQueue.clearQueue()
-    else:
-        reg.processEventQueue(pos, phy)
+    reg.processEventQueue(pos, phy)
+    reg.processVelocityMovement(pos, phy)
+    phy.eventQueue.clearQueue()
 
 proc physicsSystem*(reg: Registry) =
     for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
