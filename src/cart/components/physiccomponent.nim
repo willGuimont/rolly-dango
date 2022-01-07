@@ -18,12 +18,15 @@ type
         velocity*: Velocity
         eventQueue*: MovementEventQueue
 
-proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
+proc getTileAt(reg: Registry, x: int8, y: int8, z: int8): Option[Entity] =
     for e in reg.entitiesWith(PositionComponent, WorldTileComponent):
         let tpos = reg.getComponent[:PositionComponent](e)
-        if tpos.x == pos.x and tpos.y == pos.y and tpos.z == pos.z - 1:
+        if tpos.x == x and tpos.y == y and tpos.z == z:
             return some(e)
     return none(Entity)
+
+proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
+    return reg.getTileAt(pos.x, pos.y, pos.z-1)
 
 proc getDirectionTuple(direction: Direction): tuple[x: int8, y: int8] =
     case direction
@@ -40,13 +43,8 @@ proc getDirectionTuple(direction: Direction): tuple[x: int8, y: int8] =
 
 proc getForward(reg: Registry, pos: PositionComponent,
         direction: Direction): Option[Entity] =
-    for e in reg.entitiesWith(PositionComponent, WorldTileComponent):
-        let tpos = reg.getComponent[:PositionComponent](e)
-        let directionTuple = getDirectionTuple(direction)
-        if tpos.x == pos.x + directionTuple.x and tpos.y == pos.y +
-                directionTuple.y and tpos.z == pos.z:
-            return some(e)
-    return none(Entity)
+    let directionTuple = getDirectionTuple(direction)
+    return reg.getTileAt(pos.x + directionTuple.x, pos.y + directionTuple.y, pos.z)
 
 proc getDirection(vel: Velocity): Direction =
     #For now we only consider 4 directions
@@ -120,11 +118,51 @@ proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
                 Direction.dFront:
             pos.x.inc
             pos.z.inc
+        elif forwardTileType == WorldTileType.wttMirrorRight and (direction ==
+                Direction.dRight or direction == Direction.dFront):
+            let directionTuple = getDirectionTuple(direction)
+            pos.x += directionTuple.x
+            pos.y += directionTuple.y
+        elif forwardTileType == WorldTileType.wttMirrorFront and (direction ==
+                Direction.dFront or direction == Direction.dLeft):
+            let directionTuple = getDirectionTuple(direction)
+            pos.x += directionTuple.x
+            pos.y += directionTuple.y
+        elif forwardTileType == WorldTileType.wttMirrorLeft and (direction ==
+                Direction.dLeft or direction == Direction.dBack):
+            let directionTuple = getDirectionTuple(direction)
+            pos.x += directionTuple.x
+            pos.y += directionTuple.y
+        elif forwardTileType == WorldTileType.wttMirrorBack and (direction ==
+                Direction.dBack or direction == Direction.dLeft):
+            let directionTuple = getDirectionTuple(direction)
+            pos.x += directionTuple.x
+            pos.y += directionTuple.y
+
         else:
             phy.velocity = Velocity(x: 0, y: 0)
 
+proc processMirror(reg: Registry, pos: PositionComponent,
+        phy: PhysicsComponent) =
+    let entityHere = reg.getTileAt(pos.x, pos.y, pos.z)
+    if entityHere.isSome():
+
+        case reg.getComponent[:WorldTileComponent](
+                entityHere.get()).tileType
+        of wttMirrorRight, wttMirrorLeft:
+            let velx = phy.velocity.x
+            phy.velocity.x = phy.velocity.y
+            phy.velocity.y = velx
+        of wttMirrorFront, wttMirrorBack:
+            let velx = phy.velocity.x * -1
+            phy.velocity.x = phy.velocity.y * -1
+            phy.velocity.y = velx
+        else:
+            return
+
 proc processVelocityMovement(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
+    processMirror(reg, pos, phy)
     let direction = getDirection(phy.velocity)
     moveOneTile(reg, pos, phy, direction)
 

@@ -153,3 +153,57 @@ suite "physiccomponent":
 
         let pos = reg.getComponent[:PositionComponent](entity)
         check pos.x == 1
+
+    test "When moving into mirror tile from the right direction, can enter tile":
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 1, 1, 0)
+
+        reg.makeTileAt(0, 0, 0)
+        reg.makeTileAt(1, 0, 0)
+        reg.makeTileAt(1, 0, 1, wttMirrorRight)
+
+        reg.physicsSystem()
+
+        let pos = reg.getComponent[:PositionComponent](entity)
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        check pos.x == 1
+        check pos.y == 0
+        check pos.z == 1
+        check phy.velocity.x == 0
+
+    test "When moving into mirror tile from the wrong direction, stops":
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 1, 2, 0)
+
+        reg.makeTileAt(0, 0, 0)
+        reg.makeTileAt(1, 0, 0)
+        reg.makeTileAt(1, 0, 1, wttMirrorLeft)
+
+        reg.physicsSystem()
+
+        let pos = reg.getComponent[:PositionComponent](entity)
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        check pos.x == 0
+        check pos.y == 0
+        check pos.z == 1
+        check phy.velocity.x == 0
+
+    test "When moving into right mirror from front direction, should change to right":
+        var reg = newRegistry()
+        let entity = reg.makePhysicalEntityAt(0, 0, 1, 3, 0)
+
+        reg.makeTileAt(0, 0, 0)
+        reg.makeTileAt(1, 0, 0)
+        reg.makeTileAt(1, 1, 0)
+        reg.makeTileAt(1, 0, 1, wttMirrorRight)
+
+        reg.physicsSystem()
+        reg.physicsSystem()
+
+        let pos = reg.getComponent[:PositionComponent](entity)
+        let phy = reg.getComponent[:PhysicsComponent](entity)
+        check pos.x == 1
+        check pos.y == 1
+        check pos.z == 1
+        check phy.velocity.x == 0
+        check phy.velocity.y == 1

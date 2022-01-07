@@ -7,7 +7,8 @@ import ../components/positioncomponent
 
 type
   WorldTileType* = enum
-    wttTile, wttSlopeLeft, wttSlopeRight, wttSlopeFront, wttSlopeBack
+    wttTile, wttSlopeLeft, wttSlopeRight, wttSlopeFront, wttSlopeBack,
+        wttMirrorRight, wttMirrorFront, wttMirrorLeft, wttMirrorBack
   WorldTileComponent* = ref object of Component
     tileType*: WorldTileType
   Level*[T] = object
