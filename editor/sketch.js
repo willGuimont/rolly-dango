@@ -243,7 +243,9 @@ function draw() {
 }
 
 function exportWorld() {
-  var output = `const worldXSize: int = ${WORLD_SIZE}<br/>`
+  var output = "";
+  output += "import ../../components/worldtilecomponent<br/><br/>"
+  output += `const worldXSize: int = ${WORLD_SIZE}<br/>`
   output += `const worldYSize: int = ${WORLD_SIZE}<br/>`
   output += `const worldZSize: int = ${WORLD_HEIGHT}<br/>`
   output += `const worldData: array[${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}, uint8] = [`
@@ -265,8 +267,8 @@ function exportWorld() {
       }
     }
   }
-  output += "]<br/>"
-
+  output += "]<br/><br/>"
+  output += "makeLevel(TODO_INSERT_LEVEL_NAME)<br/><br/>"
 
   select("#exported").html(output);
 }
