@@ -7,6 +7,7 @@ import cart/components/positioncomponent
 import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
+import cart/components/playercomponent
 import cart/assets/levels/testlevel06
 import cart/input/gamepad
 import cart/state/gamestatemachine
@@ -76,5 +77,6 @@ proc update {.exportWasm.} =
   theGamepad.updateGamepad()
   render(reg)
   processInput(reg)
+  reg.playerUpdate()
   if (frameCount mod 15) == 0:
     reg.physicsSystem()
