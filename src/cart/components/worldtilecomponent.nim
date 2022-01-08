@@ -7,7 +7,8 @@ import ../components/positioncomponent
 
 type
   WorldTileType* = enum
-    wttTile, wttSlopeLeft, wttSlopeRight, wttSlopeFront, wttSlopeBack
+    wttTile, wttSlopeLeft, wttSlopeRight, wttSlopeFront, wttSlopeBack,
+        wttMirrorRight, wttMirrorFront, wttMirrorLeft, wttMirrorBack
   WorldTileComponent* = ref object of Component
     tileType*: WorldTileType
   Level*[T] = object
@@ -30,6 +31,10 @@ proc intToTileType(x: uint8): Option[WorldTileType] =
     of 3: some(wttSlopeRight)
     of 4: some(wttSlopeLeft)
     of 5: some(wttSlopeBack)
+    of 6: some(wttMirrorFront)
+    of 7: some(wttMirrorRight)
+    of 8: some(wttMirrorLeft)
+    of 9: some(wttMirrorBack)
     else: none(WorldTileType)
 
 proc intToSprite(x: uint8): Option[Sprite] =
@@ -40,6 +45,10 @@ proc intToSprite(x: uint8): Option[Sprite] =
     of 3: some(slopeRightSprite)
     of 4: some(slopeLeftSprite)
     of 5: some(slopeBackSprite)
+    of 6: some(mirrorFrontSprite)
+    of 7: some(mirrorRightSprite)
+    of 8: some(mirrorLeftSprite)
+    of 9: some(mirrorBackSprite)
     else: none(Sprite)
 
 proc buildLevel*[T](reg: Registry, level: Level[T]) =
