@@ -13,6 +13,19 @@ const TILE_SLOPE_FRONT = 2;
 const TILE_SLOPE_RIGHT = 3;
 const TILE_SLOPE_LEFT = 4;
 const TILE_SLOPE_BACK = 5;
+const TILE_MIRROR_FRONT = 6;
+const TILE_MIRROR_RIGHT = 7;
+const TILE_MIRROR_LEFT = 8;
+const TILE_MIRROR_BACK = 9;
+const TILE_PUNCH_FRONT = 10;
+const TILE_PUNCH_RIGHT = 11;
+const TILE_PUNCH_LEFT = 12;
+const TILE_PUNCH_BACK = 13;
+const TILE_ICE = 14;
+const TILE_STARTING = 15;
+const TILE_ENDING = 16;
+
+var selectingTileTypeButtons = []
 var selectedTileType = TILE_CUBE;
 
 var showText = false;
@@ -49,6 +62,13 @@ function setup() {
   zAngle = PI / 4;
 
   textFont(font);
+
+  for (let i = TILE_AIR; i <= TILE_ENDING; ++i) {
+    var button = createButton(tileToString(i));
+    button.position(3 * width / 4, i * 25 + height / 4);
+    button.mouseClicked(() => selectedTileType = i);
+    selectingTileTypeButtons.push(button);
+  }
 }
 
 function drawSlope() {
@@ -79,6 +99,12 @@ function drawSlope() {
   pop();
 }
 
+function drawPunch() {
+  scale(0.3);
+  rotateZ(PI/2);
+  cone(40, 70);
+}
+
 function drawTile(tile) {
   push();
   if (tile == TILE_AIR) {
@@ -97,6 +123,47 @@ function drawTile(tile) {
   } else if (tile == TILE_SLOPE_BACK) {
     rotateZ(-3 * PI / 2);
     drawSlope();
+  } else if (tile == TILE_MIRROR_FRONT) {
+    rotateX(3 * PI / 2);
+    rotateY(PI / 2);
+    drawSlope();
+  } else if (tile == TILE_MIRROR_RIGHT) {
+    rotateX(PI / 2);
+    rotateY(PI / 2);
+    drawSlope();
+  } else if (tile == TILE_MIRROR_LEFT) {
+    rotateX(PI / 2);
+    rotateY(-PI / 2);
+    drawSlope();
+  } else if (tile == TILE_MIRROR_BACK) {
+    rotateX(PI / 2);
+    rotateY(-4*PI/2);
+    drawSlope();
+  } else if (tile == TILE_PUNCH_FRONT) {
+    rotateX(3 * PI / 2);
+    rotateY(PI / 2);
+    drawPunch();
+  } else if (tile == TILE_PUNCH_RIGHT) {
+    rotateX(PI / 2);
+    rotateY(PI / 2);
+    drawPunch();
+  } else if (tile == TILE_PUNCH_LEFT) {
+    rotateX(PI / 2);
+    rotateY(-PI / 2);
+    drawPunch();
+  } else if (tile == TILE_PUNCH_BACK) {
+    rotateX(PI / 2);
+    rotateY(-4*PI/2);
+    drawPunch();
+  } else if (tile == TILE_ICE) {
+    fill(127, 127, 255);
+    box(TILE_SIZE);
+  } else if (tile == TILE_STARTING) {
+    fill(0, 255, 0);
+    box(TILE_SIZE);
+  } else if (tile == TILE_ENDING) {
+    fill(255, 0, 0);
+    box(TILE_SIZE);
   } else {
     console.log("invalid tile type: " + tile)
   }
@@ -107,22 +174,49 @@ function showZLevel() {
   select("#zLevel").html("ZLevel: " + zLevel);
 }
 
-function showTileType() {
+function tileToString(tile) {
   var asString = "";
-  if (selectedTileType == TILE_AIR)
+  if (tile == TILE_AIR)
     asString = "AIR";
-  else if (selectedTileType == TILE_CUBE)
+  else if (tile == TILE_CUBE)
     asString = "CUBE";
-  else if (selectedTileType == TILE_SLOPE_FRONT)
+  else if (tile == TILE_SLOPE_FRONT)
     asString = "SLOPE_FRONT";
-  else if (selectedTileType == TILE_SLOPE_RIGHT)
+  else if (tile == TILE_SLOPE_RIGHT)
     asString = "SLOPE_RIGHT";
-  else if (selectedTileType == TILE_SLOPE_LEFT)
+  else if (tile == TILE_SLOPE_LEFT)
     asString = "SLOPE_LEFT";
-  else if (selectedTileType == TILE_SLOPE_BACK)
+  else if (tile == TILE_SLOPE_BACK)
     asString = "SLOPE_BACK";
+  else if (tile == TILE_MIRROR_FRONT)
+    asString = "TILE_MIRROR_FRONT"
+  else if (tile == TILE_MIRROR_RIGHT)
+    asString = "TILE_MIRROR_RIGHT"
+  else if (tile == TILE_MIRROR_LEFT)
+    asString = "TILE_MIRROR_LEFT"
+  else if (tile == TILE_MIRROR_BACK)
+    asString = "TILE_MIRROR_BACK"
+  else if (tile == TILE_PUNCH_FRONT)
+    asString = "TILE_PUNCH_FRONT"
+  else if (tile == TILE_PUNCH_RIGHT)
+    asString = "TILE_PUNCH_RIGHT"
+  else if (tile == TILE_PUNCH_LEFT)
+    asString = "TILE_PUNCH_LEFT"
+  else if (tile == TILE_PUNCH_BACK)
+    asString = "TILE_PUNCH_BACK"
+  else if (tile == TILE_ICE)
+    asString = "TILE_ICE"
+  else if (tile == TILE_STARTING)
+    asString = "TILE_STARTING"
+  else if (tile == TILE_ENDING)
+    asString = "TILE_ENDING"
   else
-    console.log("asString invalid tileType: " + selectedTileType);
+    console.log("asString invalid tileType: " + tile);
+  return asString;
+}
+
+function showTileType() {
+  let asString = tileToString(selectedTileType);
   select("#tileType").html("TyleType: " + asString);
 }
 
@@ -157,8 +251,6 @@ function view() {
       for (let y = 0; y < WORLD_SIZE; y++) {
         if (x == selectedX && y == selectedY && z == zLevel) {
           fill(252, 171, 251, 125);
-        } else if (x == 0 && y == 0 && z == 0) {
-          fill(255, 0, 0);
         } else {
           fill(255);
         }
@@ -209,8 +301,6 @@ function edit() {
         fill(252, 171, 251);
         selectedX = x;
         selectedY = y;
-      } else if (x == 0 && y == 0) {
-        fill(255, 0, 0);
       } else {
         fill(255);
       }
@@ -249,7 +339,7 @@ function exportWorld() {
   output += `const worldYSize: int = ${WORLD_SIZE}<br/>`
   output += `const worldZSize: int = ${WORLD_HEIGHT}<br/>`
   output += `const worldData: array[${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}, uint8] = [`
-  
+
   var firstTile = true;
 
   for (let z = 0; z < WORLD_HEIGHT; z++) {
