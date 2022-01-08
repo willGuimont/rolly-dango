@@ -59,18 +59,21 @@ proc intToSprite(x: uint8): Option[Sprite] =
         of 16: some(cupSprite)
         else: none(Sprite)
 
-proc createDangoAt(reg: Registry, i, j, k: int8, g: Gamepad) =
-    var dango = reg.newEntity()
+proc createDangoAt(s: LevelState, i, j, k: int8) =
+    var dango = s.reg.newEntity()
     var inputTopic = newTopic[MovementMessage]()
+    var gameTopic = newTopic[GameMessage]()
+    s.eventQueue.followTopic(gameTopic)
     let phyComponent = newPhysicsComponent(Velocity(x: 0, y: 0))
     phyComponent.eventQueue.followTopic(inputTopic)
-    reg.addComponent(dango, SpriteComponent(sprite: dangoSprite))
-    reg.addComponent(dango, PositionComponent(x: i, y: j, z: k))
-    reg.addComponent(dango, InputComponent(gamepad: g,
-        physicTopic: inputTopic))
-    reg.addComponent(dango, phyComponent)
+    s.reg.addComponent(dango, SpriteComponent(sprite: dangoSprite))
+    s.reg.addComponent(dango, PositionComponent(x: i, y: j, z: k))
+    s.reg.addComponent(dango, InputComponent(gamepad: s.gamepad,
+        physicTopic: inputTopic, gameTopic: gameTopic))
+    s.reg.addComponent(dango, phyComponent)
 
-proc buildLevel*(reg: Registry, level: Level, g: Gamepad) =
+proc buildLevel*(s: LevelState) =
+    let level = s.levelData
     let x = level.x
     let y = level.y
     let z = level.z
@@ -83,17 +86,21 @@ proc buildLevel*(reg: Registry, level: Level, g: Gamepad) =
                 let oSprite = intToSprite(tileType)
                 if ott.isSome() and oSprite.isSome():
                     let tt = ott.get()
-                    var e = reg.newEntity()
-                    reg.addComponent(e, SpriteComponent(sprite: oSprite.get()))
-                    reg.addComponent(e, PositionComponent(x: int8(i), y: int8(
+                    var e = s.reg.newEntity()
+                    s.reg.addComponent(e, SpriteComponent(sprite: oSprite.get()))
+                    s.reg.addComponent(e, PositionComponent(x: int8(i), y: int8(
                             j), z: int8(k)))
-                    reg.addComponent(e, WorldTileComponent(tileType: tt))
                     if tt == wttStarting:
-                        reg.createDangoAt(int8(i), int8(j), int8(k + 1), g)
+                        s.createDangoAt(int8(i), int8(j), int8(k + 1))
+                        s.reg.addComponent(e, WorldTileComponent(
+                                tileType: wttTile))
+                    else:
+                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
 
 proc execute*(s: LevelState) =
     if not s.wasBuilt:
-        s.reg.buildLevel(s.levelData, s.gamepad)
+        s.reg.destroyAllEntity()
+        s.buildLevel()
         s.wasBuilt = true
     let m = s.eventQueue.popMessage()
     if m.isSome():
