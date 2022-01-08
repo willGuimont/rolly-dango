@@ -1,5 +1,6 @@
 import std/sugar
 import std/algorithm
+import std/options
 import cart/wasm4
 import cart/ecs/ecs
 import cart/components/spritecomponent
@@ -9,6 +10,7 @@ import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
 import cart/assets/levels/testlevel07
+import cart/assets/levels/testlevel08
 import cart/input/gamepad
 import cart/state/gamestatemachine
 
@@ -60,7 +62,8 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel07))
+  let level = newLevelList(reg, theGamepad, @[tlevel08, tlevel07])
+  sm = newStateMachine(level.get())
 
 proc setPalette() =
   PALETTE[0] = 0xf99dec
