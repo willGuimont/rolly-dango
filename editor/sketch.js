@@ -99,6 +99,12 @@ function drawSlope() {
   pop();
 }
 
+function drawPunch() {
+  scale(0.3);
+  rotateZ(PI/2);
+  cone(40, 70);
+}
+
 function drawTile(tile) {
   push();
   if (tile == TILE_AIR) {
@@ -117,43 +123,47 @@ function drawTile(tile) {
   } else if (tile == TILE_SLOPE_BACK) {
     rotateZ(-3 * PI / 2);
     drawSlope();
-  } else if (selectedTileType == TILE_MIRROR_FRONT) {
+  } else if (tile == TILE_MIRROR_FRONT) {
     rotateX(3 * PI / 2);
     rotateY(PI / 2);
     drawSlope();
-  } else if (selectedTileType == TILE_MIRROR_RIGHT) {
+  } else if (tile == TILE_MIRROR_RIGHT) {
     rotateX(PI / 2);
     rotateY(PI / 2);
     drawSlope();
-  } else if (selectedTileType == TILE_MIRROR_LEFT) {
+  } else if (tile == TILE_MIRROR_LEFT) {
     rotateX(PI / 2);
     rotateY(-PI / 2);
     drawSlope();
-  } else if (selectedTileType == TILE_MIRROR_BACK) {
+  } else if (tile == TILE_MIRROR_BACK) {
     rotateX(PI / 2);
     rotateY(-4*PI/2);
     drawSlope();
-  } else if (selectedTileType == TILE_PUNCH_FRONT) {
-    rotateX(PI / 2);// TODO HERE
-    drawSlope();
-  } else if (selectedTileType == TILE_PUNCH_RIGHT) {
+  } else if (tile == TILE_PUNCH_FRONT) {
+    rotateX(3 * PI / 2);
+    rotateY(PI / 2);
+    drawPunch();
+  } else if (tile == TILE_PUNCH_RIGHT) {
     rotateX(PI / 2);
-    drawSlope();
-  } else if (selectedTileType == TILE_PUNCH_LEFT) {
+    rotateY(PI / 2);
+    drawPunch();
+  } else if (tile == TILE_PUNCH_LEFT) {
     rotateX(PI / 2);
-    drawSlope();
-  } else if (selectedTileType == TILE_PUNCH_BACK) {
+    rotateY(-PI / 2);
+    drawPunch();
+  } else if (tile == TILE_PUNCH_BACK) {
     rotateX(PI / 2);
-    drawSlope();
-  } else if (selectedTileType == TILE_ICE) {
-    rotateX(PI / 2);
-    drawSlope();
-  } else if (selectedTileType == TILE_STARTING) {
-    rotateX(PI / 2);
-    drawSlope();
-  } else if (selectedTileType == TILE_ENDING) {
-    rotateX(PI / 2);
-    drawSlope();
+    rotateY(-4*PI/2);
+    drawPunch();
+  } else if (tile == TILE_ICE) {
+    fill(127, 127, 255);
+    box(TILE_SIZE);
+  } else if (tile == TILE_STARTING) {
+    fill(0, 255, 0);
+    box(TILE_SIZE);
+  } else if (tile == TILE_ENDING) {
+    fill(255, 0, 0);
+    box(TILE_SIZE);
   } else {
     console.log("invalid tile type: " + tile)
   }
@@ -241,8 +251,6 @@ function view() {
       for (let y = 0; y < WORLD_SIZE; y++) {
         if (x == selectedX && y == selectedY && z == zLevel) {
           fill(252, 171, 251, 125);
-        } else if (x == 0 && y == 0 && z == 0) {
-          fill(255, 0, 0);
         } else {
           fill(255);
         }
@@ -293,8 +301,6 @@ function edit() {
         fill(252, 171, 251);
         selectedX = x;
         selectedY = y;
-      } else if (x == 0 && y == 0) {
-        fill(255, 0, 0);
       } else {
         fill(255);
       }
