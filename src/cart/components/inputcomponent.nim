@@ -1,11 +1,13 @@
 import ../ecs/ecs
 import ../input/gamepad
 import ../components/physiccomponent
+import ../state/levelstateevents
 import ../events/eventqueue
 
 type InputComponent* = ref object of Component
     gamepad*: Gamepad
     physicTopic*: MovementTopic
+    gameTopic*: GameTopic
 
 proc processInput*(reg: Registry) =
     for (ic) in reg.entitiesWithComponents(InputComponent):
@@ -17,3 +19,5 @@ proc processInput*(reg: Registry) =
             ic.physicTopic.sendMessage(mmMoveFront)
         elif ic.gamepad.isBack():
             ic.physicTopic.sendMessage(mmMoveBack)
+        elif ic.gamepad.isButton1:
+            ic.gameTopic.sendMessage(gmReset)

@@ -1,7 +1,6 @@
 import std/sugar
 import std/algorithm
 import cart/wasm4
-import cart/assets/sprites
 import cart/ecs/ecs
 import cart/components/spritecomponent
 import cart/components/positioncomponent
@@ -10,18 +9,20 @@ import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/assets/levels/testlevel06
 import cart/input/gamepad
-import cart/events/eventqueue
+import cart/state/statemachine
+import cart/state/levelstate
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
 proc NimMain {.importc.}
 
-var gamepad: Gamepad = getNewGamepad(GAMEPAD1[])
+var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
 var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
 var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
 var frameCount: int = 0
+var sm: StateMachine
 
 proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   var iso_x: int32 = int32(position.x) * -decal.x + int32(position.y)*decal.x +
@@ -59,13 +60,15 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  reg.buildLevel(tlevel06, gamepad)
+  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel06))
 
 proc start {.exportWasm.} =
   NimMain()
   buildWorld()
 
 proc update {.exportWasm.} =
+  sm.execute()
+  sm.transition()
   frameCount.inc
   if reg == nil:
     return

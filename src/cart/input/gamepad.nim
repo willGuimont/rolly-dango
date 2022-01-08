@@ -24,3 +24,9 @@ proc isFront*(theGamepad: Gamepad): bool =
 
 proc isBack*(theGamepad: Gamepad): bool =
     return bool(theGamepad.gamepad and BUTTON_UP)
+
+proc isButton1*(theGamepad: Gamepad): bool =
+    return bool(theGamepad.gamepad and BUTTON_1)
+
+proc isButton2*(theGamepad: Gamepad): bool =
+    return bool(theGamepad.gamepad and BUTTON_2)
