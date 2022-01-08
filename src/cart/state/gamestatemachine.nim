@@ -7,6 +7,7 @@ import ../components/positioncomponent
 import ../components/physiccomponent
 import ../components/inputcomponent
 import ../components/worldtilecomponent
+import ../components/playercomponent
 import ../input/gamepad
 import levelstateevents
 
@@ -19,13 +20,17 @@ type
         levelData*: Level[array[500, uint8]]
         wasBuilt*: bool
         eventQueue: GameEventQueue
+        gameTopic: Topic[GameMessage]
     StateMachine*[T] = object
         currentState: T
 
 proc newLevelState*(reg: Registry, g: Gamepad, level: Level[array[500,
         uint8]]): LevelState =
+    let eventQueue = newEventQueue[GameMessage]()
+    var gameTopic = newTopic[GameMessage]()
+    eventQueue.followTopic(gameTopic)
     return LevelState(reg: reg, gamepad: g, levelData: level, wasBuilt: false,
-            eventQueue: newEventQueue[GameMessage]())
+            eventQueue: eventQueue, gameTopic: gameTopic)
 
 proc intToTileType(x: uint8): Option[WorldTileType] =
     case x:
@@ -62,15 +67,14 @@ proc intToSprite(x: uint8): Option[Sprite] =
 proc createDangoAt(s: LevelState, i, j, k: int8) =
     var dango = s.reg.newEntity()
     var inputTopic = newTopic[MovementMessage]()
-    var gameTopic = newTopic[GameMessage]()
-    s.eventQueue.followTopic(gameTopic)
     let phyComponent = newPhysicsComponent(Velocity(x: 0, y: 0))
     phyComponent.eventQueue.followTopic(inputTopic)
     s.reg.addComponent(dango, SpriteComponent(sprite: dangoSprite))
     s.reg.addComponent(dango, PositionComponent(x: i, y: j, z: k))
     s.reg.addComponent(dango, InputComponent(gamepad: s.gamepad,
-        physicTopic: inputTopic, gameTopic: gameTopic))
+        physicTopic: inputTopic, gameTopic: s.gameTopic))
     s.reg.addComponent(dango, phyComponent)
+    s.reg.addComponent(dango, PlayerComponent(gameTopic: s.gameTopic))
 
 proc buildLevel*(s: LevelState) =
     let level = s.levelData
