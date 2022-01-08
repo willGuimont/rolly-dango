@@ -13,9 +13,19 @@ type
     MovementMessage* = enum mmMoveRight, mmMoveFront, mmMoveLeft, mmMoveBack
     MovementTopic* = Topic[MovementMessage]
     MovementEventQueue* = EventQueue[MovementMessage]
+    ObserverPunchMessageEnum* = enum opmPunchRight, opmPunchFront,opmPunchLeft,opmPunchBack
+    ObserverPunchMessage* = object
+        message*:ObserverPunchMessageEnum
+        entityObserved*: uint32
+        positionObserved*:PositionComponent
+    ObserverPunchTopic* = Topic[ObserverPunchMessage]
+    ObserverPunchEventQueue* = EventQueue[ObserverPunchMessage]
     PhysicsComponent* = ref object of Component
         velocity*: Velocity
         eventQueue*: MovementEventQueue
+
+let PUNCH_VELOCITY_INCREASE :int8= 3
+let observerEventQueue*: ObserverPunchEventQueue = ObserverPunchEventQueue()
 
 proc newPhysicsComponent*(velocity: Velocity): PhysicsComponent =
     return PhysicsComponent(velocity: velocity, eventQueue: MovementEventQueue())
@@ -48,6 +58,7 @@ proc getForward(reg: Registry, pos: PositionComponent,
     let directionTuple = getDirectionTuple(direction)
     return reg.getTileAt(pos.x + directionTuple.x, pos.y + directionTuple.y, pos.z)
 
+
 proc getDirection(vel: Velocity): Direction =
     #For now we only consider 4 directions
     if vel.x == 0 and vel.y > 0:
@@ -60,6 +71,21 @@ proc getDirection(vel: Velocity): Direction =
         return Direction.dBack
     if vel.x == 0 and vel.y == 0:
         return Direction.dNone
+
+proc transfertVelocity(vel:Velocity,direction:Direction):Velocity=
+    let value = vel.x + vel.y
+    case direction
+    of dRight:
+        return Velocity(x: 0,y: abs(value))
+    of dFront:
+        return Velocity(x: abs(value),y: 0)
+    of dLeft:
+        return Velocity(x: 0,y: -abs(value))
+    of dBack:
+        return Velocity(x: -abs(value),y: 0)
+    else:
+        return Velocity(x: 0, y: 0)
+    
 
 proc tileFriction(phy: PhysicsComponent): Velocity =
     let direction = getDirectionTuple(getDirection(phy.velocity))
@@ -205,9 +231,56 @@ proc processMovement(reg: Registry, pos: PositionComponent,
     reg.processVelocityMovement(pos, phy)
     phy.eventQueue.clearQueue()
 
+proc processPunch(direction:Direction,pos:PositionComponent,phy:PhysicsComponent)=
+    case direction
+    of dRight:
+        pos.y.inc()
+        var newVel = transfertVelocity(phy.velocity, dRight)
+        newVel.y += PUNCH_VELOCITY_INCREASE
+        phy.velocity = newVel
+    of dFront:
+        pos.x.inc()
+        var newVel = transfertVelocity(phy.velocity, dFront)
+        newVel.x += PUNCH_VELOCITY_INCREASE
+        phy.velocity = newVel
+    of dLeft:
+        pos.y.dec()
+        var newVel = transfertVelocity(phy.velocity, dLeft)
+        newVel.y -= PUNCH_VELOCITY_INCREASE
+        phy.velocity = newVel
+    of dBack:
+        pos.x.dec()
+        var newVel = transfertVelocity(phy.velocity, dBack)
+        newVel.x -= PUNCH_VELOCITY_INCREASE
+        phy.velocity = newVel
+    else:
+        discard
+
+proc processObserverMessage(reg:Registry, message:ObserverPunchMessage)=
+    for entity in reg.entitiesWith(PositionComponent,PhysicsComponent):
+        if entity == message.entityObserved and reg.getComponent[:PositionComponent](entity) == message.positionObserved:
+            let (pos, phy) = reg.getComponents(entity,PositionComponent,PhysicsComponent)
+            case message.message
+            of opmPunchRight:
+                processPunch(Direction.dRight,pos,phy)
+            of opmPunchFront:
+                processPunch(Direction.dFront,pos,phy)
+            of opmPunchLeft:
+                processPunch(Direction.dLeft,pos,phy)
+            of opmPunchBack:
+                processPunch(Direction.dBack,pos,phy)
+
+proc processObserver(reg:Registry) =
+    var message = observerEventQueue.popMessage()
+    while message.isSome():
+        reg.processObserverMessage(message.get())
+        message = observerEventQueue.popMessage()    
+
 proc physicsSystem*(reg: Registry) =
+    processObserver(reg)
     for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
             PhysicsComponent):
+        
         processMovement(reg, pos, phy)
         processTileFriction(reg, pos, phy)
         processGravity(reg, pos)
