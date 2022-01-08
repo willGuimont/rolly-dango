@@ -10,7 +10,6 @@ import cart/components/inputcomponent
 import cart/assets/levels/testlevel06
 import cart/input/gamepad
 import cart/state/statemachine
-import cart/state/levelstate
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
@@ -22,7 +21,7 @@ var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
 var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
 var frameCount: int = 0
-var sm: StateMachine
+var sm: StateMachine[LevelState]
 
 proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   var iso_x: int32 = int32(position.x) * -decal.x + int32(position.y)*decal.x +
@@ -67,11 +66,12 @@ proc start {.exportWasm.} =
   buildWorld()
 
 proc update {.exportWasm.} =
-  sm.execute()
-  sm.transition()
   frameCount.inc
   if reg == nil:
     return
+
+  sm.execute()
+  sm.transition()
 
   theGamepad.updateGamepad()
   render(reg)
