@@ -13,6 +13,17 @@ const TILE_SLOPE_FRONT = 2;
 const TILE_SLOPE_RIGHT = 3;
 const TILE_SLOPE_LEFT = 4;
 const TILE_SLOPE_BACK = 5;
+const TILE_MIRROR_FRONT = 6;
+const TILE_MIRROR_RIGHT = 7;
+const TILE_MIRROR_LEFT = 8;
+const TILE_MIRROR_BACK = 9;
+const TILE_PUNCH_FRONT = 10;
+const TILE_PUNCH_RIGHT = 11;
+const TILE_PUNCH_LEFT = 12;
+const TILE_PUNCH_BACK = 13;
+const TILE_ICE = 14;
+const TILE_STARTING = 15;
+const TILE_ENDING = 16;
 var selectedTileType = TILE_CUBE;
 
 var showText = false;
