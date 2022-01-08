@@ -15,7 +15,6 @@ type
     LevelState* = ref object
         nextState*: Option[LevelState]
         needsToTransition: bool
-        needsToQuit*: bool
         reg*: Registry
         gamepad: Gamepad
         levelData*: Level[array[500, uint8]]
@@ -144,4 +143,5 @@ proc transition*(sm: var StateMachine) =
         sm.currentState = sm.currentState.nextState.get()
 
 proc isFinished*(sm: StateMachine): bool =
-    return sm.needsToQuit
+    return sm.currentState.needsToTransition and
+            sm.currentState.nextState.isNone()

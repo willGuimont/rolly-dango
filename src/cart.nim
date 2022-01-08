@@ -26,6 +26,10 @@ var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
 var frameCount: int = 0
 var sm: StateMachine[LevelState]
 
+var isTitleScreen = true
+var isInGame = false
+var isEndingScreen = false
+
 proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   var iso_x: int32 = int32(position.x) * -decal.x + int32(position.y)*decal.x +
       int32(position.z)*0 + origin.x
@@ -76,7 +80,7 @@ proc start {.exportWasm.} =
   setPalette()
   buildWorld()
 
-proc update {.exportWasm.} =
+proc runGame() =
   frameCount.inc
   if reg == nil:
     return
@@ -90,3 +94,17 @@ proc update {.exportWasm.} =
   reg.playerUpdate()
   if (frameCount mod 15) == 0:
     reg.physicsSystem()
+
+proc update {.exportWasm.} =
+  if isTitleScreen:
+    text("Rolly Dango", 0, 0)
+    if bool(GAMEPAD1[] and BUTTON_1):
+      isTitleScreen = false
+      isInGame = true
+  elif isInGame:
+    runGame()
+    if sm.isFinished():
+      isInGame = false
+      isEndingScreen = true
+  elif isEndingScreen:
+    text("Finished the game :)", 0, 0)
