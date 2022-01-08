@@ -8,6 +8,7 @@ import ../components/physiccomponent
 import ../components/inputcomponent
 import ../components/worldtilecomponent
 import ../components/playercomponent
+import ../components/observercomponent
 import ../input/gamepad
 import levelstateevents
 
@@ -86,6 +87,24 @@ proc createDangoAt(s: LevelState, i, j, k: int8) =
     s.reg.addComponent(dango, phyComponent)
     s.reg.addComponent(dango, PlayerComponent(gameTopic: s.gameTopic))
 
+proc addPunchObserver(reg: Registry, entity: Entity, punchType: ObserverType, i,
+        j, k: int8) =
+    var observerTopic = newTopic[ObserverPunchMessage]()
+    var observing: seq[PositionComponent]
+    case punchType
+    of otPunchRight:
+        observing.add(PositionComponent(x: i, y: j+1, z: k))
+    of otPunchFront:
+        observing.add(PositionComponent(x: i+1, y: j, z: k))
+    of otPunchLeft:
+        observing.add(PositionComponent(x: i, y: j-1, z: k))
+    of otPunchBack:
+        observing.add(PositionComponent(x: i-1, y: j, z: k))
+    var observerComponent = ObserverComponent(positionObserving: observing,
+            physicsTopic: observerTopic, observerType: punchType)
+
+    reg.addComponent(entity, observerComponent)
+
 proc buildLevel*(s: LevelState) =
     let level = s.levelData
     let x = level.x
@@ -108,6 +127,22 @@ proc buildLevel*(s: LevelState) =
                         s.createDangoAt(int8(i), int8(j), int8(k + 1))
                         s.reg.addComponent(e, WorldTileComponent(
                                 tileType: wttTile))
+                    elif tt == wttPunchRight:
+                        addPunchObserver(s.reg, e, otPunchRight, int8(i), int8(
+                                j), int8(k))
+                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
+                    elif tt == wttPunchFront:
+                        addPunchObserver(s.reg, e, otPunchFront, int8(i), int8(
+                                j), int8(k))
+                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
+                    elif tt == wttPunchLeft:
+                        addPunchObserver(s.reg, e, otPunchLeft, int8(i), int8(
+                                j), int8(k))
+                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
+                    elif tt == wttPunchBack:
+                        addPunchObserver(s.reg, e, otPunchBack, int8(i), int8(
+                                j), int8(k))
+                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
                     else:
                         s.reg.addComponent(e, WorldTileComponent(tileType: tt))
 

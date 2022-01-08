@@ -8,7 +8,7 @@ import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
-import cart/assets/levels/testlevel07
+import cart/assets/levels/testlevel08
 import cart/input/gamepad
 import cart/state/gamestatemachine
 
@@ -60,7 +60,7 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel07))
+  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel08))
 
 proc setPalette() =
   PALETTE[0] = 0xf99dec
