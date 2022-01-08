@@ -4,11 +4,15 @@ import ../ecs/ecs
 import ../assets/sprites
 import ../components/spritecomponent
 import ../components/positioncomponent
+import ../components/physiccomponent
+import ../components/inputcomponent
+import ../events/eventqueue
+import ../input/gamepad
 
 type
   WorldTileType* = enum
     wttTile, wttSlopeLeft, wttSlopeRight, wttSlopeFront, wttSlopeBack,
-        wttMirrorRight, wttMirrorFront, wttMirrorLeft, wttMirrorBack
+        wttMirrorRight, wttMirrorFront, wttMirrorLeft, wttMirrorBack, wttStarting, wttEnding
   WorldTileComponent* = ref object of Component
     tileType*: WorldTileType
   Level*[T] = object
@@ -35,6 +39,8 @@ proc intToTileType(x: uint8): Option[WorldTileType] =
     of 7: some(wttMirrorRight)
     of 8: some(wttMirrorLeft)
     of 9: some(wttMirrorBack)
+    of 15: some(wttStarting)
+    of 16: some(wttEnding)
     else: none(WorldTileType)
 
 proc intToSprite(x: uint8): Option[Sprite] =
@@ -49,9 +55,22 @@ proc intToSprite(x: uint8): Option[Sprite] =
     of 7: some(mirrorRightSprite)
     of 8: some(mirrorLeftSprite)
     of 9: some(mirrorBackSprite)
+    of 15: some(tileSprite)
+    of 16: some(TODO)
     else: none(Sprite)
 
-proc buildLevel*[T](reg: Registry, level: Level[T]) =
+proc createDangoAt(reg: Registry, i, j, k: int8, g: Gamepad) =
+  var dangoEntity = reg.newEntity()
+  var inputTopic = newTopic[MovementMessage]()
+  let phyComponent = newPhysicsComponent(Velocity(x: 0, y: 0))
+  phyComponent.eventQueue.followTopic(inputTopic)
+  reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
+  reg.addComponent(dangoEntity, PositionComponent(x: i, y: j, z: k))
+  reg.addComponent(dangoEntity, InputComponent(gamepad: g,
+      physicTopic: inputTopic))
+  reg.addComponent(dangoEntity, phyComponent)
+
+proc buildLevel*[T](reg: Registry, level: Level[T], g: Gamepad) =
   let x = level.x
   let y = level.y
   let z = level.z
@@ -68,3 +87,6 @@ proc buildLevel*[T](reg: Registry, level: Level[T]) =
           reg.addComponent(e, SpriteComponent(sprite: oSprite.get()))
           reg.addComponent(e, PositionComponent(x: int8(i), y: int8(j), z: int8(k)))
           reg.addComponent(e, WorldTileComponent(tileType: tt))
+          if tt == wttStarting:
+            reg.createDangoAt(i, j, k + 1, g)
+

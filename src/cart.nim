@@ -16,7 +16,7 @@ import cart/events/eventqueue
 # preventing unexpected errors
 proc NimMain {.importc.}
 
-var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
+var gamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
 var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
@@ -30,7 +30,7 @@ proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
       int32(position.z) * -decal.z + origin.y
   return (x: iso_x, y: isoY)
 
-proc render(reg: Registry) {.exportWasm.} =
+proc render(reg: Registry) =
 
   proc comparePositions(e1, e2: Entity): int =
     let p1 = reg.getComponent[:PositionComponent](e1)
@@ -59,17 +59,7 @@ proc render(reg: Registry) {.exportWasm.} =
 
 proc buildWorld() =
   reg = newRegistry()
-  reg.buildLevel(tlevel06)
-
-  var dangoEntity = reg.newEntity()
-  var inputTopic = newTopic[MovementMessage]()
-  let phyComponent = newPhysicsComponent(Velocity(x: 0, y: 0))
-  phyComponent.eventQueue.followTopic(inputTopic)
-  reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
-  reg.addComponent(dangoEntity, PositionComponent(x: 0, y: 0, z: 6))
-  reg.addComponent(dangoEntity, InputComponent(gamepad: theGamepad,
-      physicTopic: inputTopic))
-  reg.addComponent(dangoEntity, phyComponent)
+  reg.buildLevel(tlevel06, gamepad)
 
 proc start {.exportWasm.} =
   NimMain()
