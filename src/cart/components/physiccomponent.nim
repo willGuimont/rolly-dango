@@ -96,7 +96,6 @@ proc processGravity(reg: Registry, pos: PositionComponent) =
 
 proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
         direction: Direction) =
-
     let entityHere = reg.getTileAt(pos.x, pos.y, pos.z)
     if entityHere.isSome():
         let hereTileType = reg.getComponent[:WorldTileComponent](
@@ -113,7 +112,6 @@ proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
         if hereTileType == wttMirrorBack and (direction ==
                 Direction.dRight or direction == Direction.dFront):
             return
-
     let entityForward = reg.getForward(pos, direction)
     if entityForward.isNone():
         let directionTuple = getDirectionTuple(direction)
@@ -158,7 +156,6 @@ proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
             let directionTuple = getDirectionTuple(direction)
             pos.x += directionTuple.x
             pos.y += directionTuple.y
-
         else:
             phy.velocity = Velocity(x: 0, y: 0)
 

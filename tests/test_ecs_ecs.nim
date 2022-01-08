@@ -56,6 +56,15 @@ suite "ecs":
       # also deletes the components
       discard reg.getComponent[:TestComponent](entity)
 
+  test "can delete all entites":
+    var reg = newRegistry()
+    discard reg.newEntity()
+    discard reg.newEntity()
+
+    reg.destroyAllEntity()
+
+    check reg.len() == 0
+
   test "can delete marked entities":
     var reg = newRegistry()
     var entity1 = reg.newEntity()

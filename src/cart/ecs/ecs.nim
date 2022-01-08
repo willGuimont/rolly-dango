@@ -43,6 +43,10 @@ proc allEntities*(reg: Registry): seq[Entity] =
   for e in reg.validEntities:
     result.add(e)
 
+proc destroyAllEntity*(reg: Registry) =
+  for e in reg.allEntities():
+    reg.destroyEntity(e)
+
 proc markToDestroy*(reg: Registry, entity: Entity) =
   reg.toDestroyEntities.incl(entity)
 

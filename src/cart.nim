@@ -1,7 +1,6 @@
 import std/sugar
 import std/algorithm
 import cart/wasm4
-import cart/assets/sprites
 import cart/ecs/ecs
 import cart/components/spritecomponent
 import cart/components/positioncomponent
@@ -10,7 +9,7 @@ import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/assets/levels/testlevel06
 import cart/input/gamepad
-import cart/events/eventqueue
+import cart/state/gamestatemachine
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
@@ -22,6 +21,7 @@ var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
 var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
 var frameCount: int = 0
+var sm: StateMachine[LevelState]
 
 proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   var iso_x: int32 = int32(position.x) * -decal.x + int32(position.y)*decal.x +
@@ -30,7 +30,7 @@ proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
       int32(position.z) * -decal.z + origin.y
   return (x: iso_x, y: isoY)
 
-proc render(reg: Registry) {.exportWasm.} =
+proc render(reg: Registry) =
 
   proc comparePositions(e1, e2: Entity): int =
     let p1 = reg.getComponent[:PositionComponent](e1)
@@ -59,17 +59,7 @@ proc render(reg: Registry) {.exportWasm.} =
 
 proc buildWorld() =
   reg = newRegistry()
-  reg.buildLevel(tlevel06)
-
-  var dangoEntity = reg.newEntity()
-  var inputTopic = newTopic[MovementMessage]()
-  let phyComponent = newPhysicsComponent(Velocity(x: 0, y: 0))
-  phyComponent.eventQueue.followTopic(inputTopic)
-  reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
-  reg.addComponent(dangoEntity, PositionComponent(x: 0, y: 0, z: 6))
-  reg.addComponent(dangoEntity, InputComponent(gamepad: theGamepad,
-      physicTopic: inputTopic))
-  reg.addComponent(dangoEntity, phyComponent)
+  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel06))
 
 proc start {.exportWasm.} =
   NimMain()
@@ -79,6 +69,9 @@ proc update {.exportWasm.} =
   frameCount.inc
   if reg == nil:
     return
+
+  sm.execute()
+  sm.transition()
 
   theGamepad.updateGamepad()
   render(reg)
