@@ -45,8 +45,7 @@ proc buildWorld() =
 
   var dangoEntity = reg.newEntity()
   var inputTopic = newTopic[MovementMessage]()
-  let phyComponent = PhysicsComponent(velocity: Velocity(x: 0, y: 0),
-                  eventQueue: newEventQueue[MovementMessage]())
+  let phyComponent = newPhysicsComponent(Velocity(x: 0, y: 0))
   phyComponent.eventQueue.followTopic(inputTopic)
   reg.addComponent(dangoEntity, SpriteComponent(sprite: dangoSprite))
   reg.addComponent(dangoEntity, PositionComponent(x: 0, y: 0, z: 6))
