@@ -1,3 +1,5 @@
+import std/sugar
+import std/algorithm
 import cart/wasm4
 import cart/assets/sprites
 import cart/ecs/ecs
@@ -29,8 +31,24 @@ proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   return (x: iso_x, y: isoY)
 
 proc render(reg: Registry) {.exportWasm.} =
+
+  proc comparePositions(e1, e2: Entity): int =
+    let p1 = reg.getComponent[:PositionComponent](e1)
+    let p2 = reg.getComponent[:PositionComponent](e2)
+    result = cmp(p1.z, p2.z)
+    if result == 0:
+      result = cmp(p1.x, p2.x)
+    if result == 0:
+      result = cmp(p1.y, p2.y)
+    if result == 0:
+      if reg.hasComponent[:WorldTileComponent](e1):
+        result = 1
+      else:
+        result = -1
+
   DRAW_COLORS[] = 0x4320
-  for entity in reg.entitiesWith(SpriteComponent, PositionComponent):
+  var sprites = reg.entitiesWith(SpriteComponent, PositionComponent)
+  for entity in sprites.sorted(comparePositions):
     let (spriteComponent, positionComponent) = reg.getComponents(entity,
         SpriteComponent, PositionComponent)
     let position = position_to_iso(positionComponent)
