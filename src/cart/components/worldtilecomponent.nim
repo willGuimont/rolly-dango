@@ -5,7 +5,8 @@ type
   WorldTileType* = enum
     wttTile, wttSlopeLeft, wttSlopeRight, wttSlopeFront, wttSlopeBack,
         wttMirrorRight, wttMirrorFront, wttMirrorLeft, wttMirrorBack,
-            wttStarting, wttEnding
+            wttStarting, wttEnding, wttIce, wttPunchFront, wttPunchRight,
+                wttPunchLeft, wttPunchBack
   WorldTileComponent* = ref object of Component
     tileType*: WorldTileType
   Level*[T] = object

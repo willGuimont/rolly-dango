@@ -8,7 +8,7 @@ import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
-import cart/assets/levels/testlevel06
+import cart/assets/levels/testlevel07
 import cart/input/gamepad
 import cart/state/gamestatemachine
 
@@ -60,10 +60,17 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel06))
+  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel07))
+
+proc setPalette() =
+  PALETTE[0] = 0xf99dec
+  PALETTE[1] = 0xfc49e1
+  PALETTE[2] = 0x88fce7
+  PALETTE[3] = 0x34bca3
 
 proc start {.exportWasm.} =
   NimMain()
+  setPalette()
   buildWorld()
 
 proc update {.exportWasm.} =
