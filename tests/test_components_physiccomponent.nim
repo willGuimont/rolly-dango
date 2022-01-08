@@ -9,8 +9,7 @@ proc makePhysicalEntityAt(reg: var Registry, x: int8, y: int8, z: int8,
         dx: int8 = 0, dy: int8 = 0): Entity =
     result = reg.newEntity()
     reg.addComponent(result, PositionComponent(x: x, y: y, z: z))
-    reg.addComponent(result, PhysicsComponent(velocity: Velocity(x: dx, y: dy),
-            eventQueue: MovementEventQueue()))
+    reg.addComponent(result, newPhysicsComponent(Velocity(x: dx, y: dy)))
 
 proc makeTileAt(reg: var Registry, x: int8, y: int8, z: int8,
         tileType: WorldTileType = wttTile) =
