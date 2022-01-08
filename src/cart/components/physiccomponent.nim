@@ -119,22 +119,22 @@ proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
             pos.x.inc
             pos.z.inc
         elif forwardTileType == WorldTileType.wttMirrorRight and (direction ==
-                Direction.dRight or direction == Direction.dFront):
+                Direction.dLeft or direction == Direction.dFront):
             let directionTuple = getDirectionTuple(direction)
             pos.x += directionTuple.x
             pos.y += directionTuple.y
         elif forwardTileType == WorldTileType.wttMirrorFront and (direction ==
-                Direction.dFront or direction == Direction.dLeft):
+                Direction.dBack or direction == Direction.dLeft):
             let directionTuple = getDirectionTuple(direction)
             pos.x += directionTuple.x
             pos.y += directionTuple.y
         elif forwardTileType == WorldTileType.wttMirrorLeft and (direction ==
-                Direction.dLeft or direction == Direction.dBack):
+                Direction.dRight or direction == Direction.dBack):
             let directionTuple = getDirectionTuple(direction)
             pos.x += directionTuple.x
             pos.y += directionTuple.y
         elif forwardTileType == WorldTileType.wttMirrorBack and (direction ==
-                Direction.dBack or direction == Direction.dLeft):
+                Direction.dFront or direction == Direction.dRight):
             let directionTuple = getDirectionTuple(direction)
             pos.x += directionTuple.x
             pos.y += directionTuple.y
