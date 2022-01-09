@@ -31,6 +31,8 @@ var isTitleScreen = true
 var isInGame = false
 var isEndingScreen = false
 
+var dangoVelocity*: ref Velocity
+
 proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   var iso_x: int32 = int32(position.x) * -decal.x + int32(position.y)*decal.x +
       int32(position.z)*0 + origin.x
@@ -81,6 +83,12 @@ proc start {.exportWasm.} =
   setPalette()
   buildWorld()
 
+proc displayVelocity() =
+  for entity in reg.entitiesWith(PlayerComponent, PhysicsComponent):
+    let velocity = reg.getComponent[:PhysicsComponent](entity).velocity
+    DRAW_COLORS[] = 0x0003
+    text(cstring("Velocity" & $velocity), 0, 0)
+
 proc runGame() =
   frameCount.inc
   if reg == nil:
@@ -91,6 +99,8 @@ proc runGame() =
 
   theGamepad.updateGamepad()
   render(reg)
+
+  displayVelocity()
 
   processInput(reg)
   reg.playerUpdate()
