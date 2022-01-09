@@ -145,15 +145,15 @@ function drawTile(tile) {
     drawPunch();
   } else if (tile == TILE_PUNCH_RIGHT) {
     rotateX(PI / 2);
-    rotateY(PI / 2);
+    rotateY(-2*PI/2);
     drawPunch();
   } else if (tile == TILE_PUNCH_LEFT) {
     rotateX(PI / 2);
-    rotateY(-PI / 2);
+    rotateY(-4*PI/2);
     drawPunch();
   } else if (tile == TILE_PUNCH_BACK) {
     rotateX(PI / 2);
-    rotateY(-4*PI/2);
+    rotateY(PI / 2);
     drawPunch();
   } else if (tile == TILE_ICE) {
     fill(127, 127, 255);
