@@ -8,7 +8,8 @@ import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
-import cart/assets/levels/testlevel08
+import cart/components/observercomponent
+import cart/assets/levels/testlevel09
 import cart/input/gamepad
 import cart/state/gamestatemachine
 
@@ -60,7 +61,7 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel08))
+  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel09))
 
 proc setPalette() =
   PALETTE[0] = 0xf99dec
@@ -83,7 +84,9 @@ proc update {.exportWasm.} =
 
   theGamepad.updateGamepad()
   render(reg)
+
   processInput(reg)
   reg.playerUpdate()
   if (frameCount mod 15) == 0:
+    reg.processObservers()
     reg.physicsSystem()

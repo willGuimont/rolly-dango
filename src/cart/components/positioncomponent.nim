@@ -5,3 +5,6 @@ type
       x*: int8
       y*: int8
       z*: int8
+
+proc `==`(a, b: PositionComponent): bool =
+   return a.x == b.x and a.y == b.y and a.z == b.z

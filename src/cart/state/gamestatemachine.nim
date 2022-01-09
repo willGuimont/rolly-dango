@@ -90,6 +90,7 @@ proc createDangoAt(s: LevelState, i, j, k: int8) =
 proc addPunchObserver(reg: Registry, entity: Entity, punchType: ObserverType, i,
         j, k: int8) =
     var observerTopic = newTopic[ObserverPunchMessage]()
+    observerEventQueue.followTopic(observerTopic)
     var observing: seq[PositionComponent]
     case punchType
     of otPunchRight:

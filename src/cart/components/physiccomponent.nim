@@ -231,26 +231,22 @@ proc processMovement(reg: Registry, pos: PositionComponent,
     reg.processVelocityMovement(pos, phy)
     phy.eventQueue.clearQueue()
 
-proc processPunch(direction: Direction, pos: PositionComponent,
+proc processPunch(reg: Registry, direction: Direction, pos: PositionComponent,
         phy: PhysicsComponent) =
     case direction
     of dRight:
-        pos.y.inc()
         var newVel = transfertVelocity(phy.velocity, dRight)
         newVel.y += PUNCH_VELOCITY_INCREASE
         phy.velocity = newVel
     of dFront:
-        pos.x.inc()
         var newVel = transfertVelocity(phy.velocity, dFront)
         newVel.x += PUNCH_VELOCITY_INCREASE
         phy.velocity = newVel
     of dLeft:
-        pos.y.dec()
         var newVel = transfertVelocity(phy.velocity, dLeft)
         newVel.y -= PUNCH_VELOCITY_INCREASE
         phy.velocity = newVel
     of dBack:
-        pos.x.dec()
         var newVel = transfertVelocity(phy.velocity, dBack)
         newVel.x -= PUNCH_VELOCITY_INCREASE
         phy.velocity = newVel
@@ -264,13 +260,13 @@ proc processObserverMessage(reg: Registry, message: ObserverPunchMessage) =
             let (pos, phy) = reg.getComponents(entity, PositionComponent, PhysicsComponent)
             case message.message
             of opmPunchRight:
-                processPunch(Direction.dRight, pos, phy)
+                processPunch(reg, Direction.dRight, pos, phy)
             of opmPunchFront:
-                processPunch(Direction.dFront, pos, phy)
+                processPunch(reg, Direction.dFront, pos, phy)
             of opmPunchLeft:
-                processPunch(Direction.dLeft, pos, phy)
+                processPunch(reg, Direction.dLeft, pos, phy)
             of opmPunchBack:
-                processPunch(Direction.dBack, pos, phy)
+                processPunch(reg, Direction.dBack, pos, phy)
 
 proc processObserver(reg: Registry) =
     var message = observerEventQueue.popMessage()
@@ -282,7 +278,6 @@ proc physicsSystem*(reg: Registry) =
     processObserver(reg)
     for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
             PhysicsComponent):
-
         processMovement(reg, pos, phy)
         processTileFriction(reg, pos, phy)
         processGravity(reg, pos)
