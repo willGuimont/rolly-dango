@@ -114,7 +114,6 @@ proc processTileFriction(reg: Registry, pos: PositionComponent,
             phy.velocity.x += vel.x
             phy.velocity.y += vel.y
 
-
 proc processGravity(reg: Registry, pos: PositionComponent) =
     let entityUnder = reg.standingOn(pos)
     if entityUnder.isNone():
@@ -139,7 +138,8 @@ proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
                 Direction.dRight or direction == Direction.dFront):
             return
     let entityForward = reg.getForward(pos, direction)
-    if entityForward.isNone():
+    if entityForward.isNone() or reg.getComponent[:WorldTileComponent](
+                entityForward.get()).tileType == wttEnding:
         let directionTuple = getDirectionTuple(direction)
         pos.x += directionTuple.x
         pos.y += directionTuple.y

@@ -1,5 +1,6 @@
 import std/sugar
 import std/algorithm
+import std/options
 import cart/wasm4
 import cart/ecs/ecs
 import cart/components/spritecomponent
@@ -9,6 +10,7 @@ import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
 import cart/components/observercomponent
+import cart/assets/levels/testlevel08
 import cart/assets/levels/testlevel09
 import cart/input/gamepad
 import cart/state/gamestatemachine
@@ -24,6 +26,10 @@ var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
 var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
 var frameCount: int = 0
 var sm: StateMachine[LevelState]
+
+var isTitleScreen = true
+var isInGame = false
+var isEndingScreen = false
 
 proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
   var iso_x: int32 = int32(position.x) * -decal.x + int32(position.y)*decal.x +
@@ -61,7 +67,8 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  sm = newStateMachine(newLevelState(reg, theGamepad, tlevel09))
+  let level = newLevelList(reg, theGamepad, @[tlevel09, tlevel08])
+  sm = newStateMachine(level.get())
 
 proc setPalette() =
   PALETTE[0] = 0xf99dec
@@ -74,7 +81,7 @@ proc start {.exportWasm.} =
   setPalette()
   buildWorld()
 
-proc update {.exportWasm.} =
+proc runGame() =
   frameCount.inc
   if reg == nil:
     return
@@ -90,3 +97,17 @@ proc update {.exportWasm.} =
   if (frameCount mod 15) == 0:
     reg.processObservers()
     reg.physicsSystem()
+
+proc update {.exportWasm.} =
+  if isTitleScreen:
+    text("Rolly Dango", 0, 0)
+    if bool(GAMEPAD1[] and BUTTON_1):
+      isTitleScreen = false
+      isInGame = true
+  elif isInGame:
+    runGame()
+    if sm.isFinished():
+      isInGame = false
+      isEndingScreen = true
+  elif isEndingScreen:
+    text("Finished the game :)", 0, 0)
