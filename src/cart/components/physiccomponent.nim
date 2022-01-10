@@ -128,6 +128,10 @@ proc processGravity(reg: Registry, pos: PositionComponent) =
     if entityUnder.isNone():
         pos.z.dec
 
+proc isSlope(tileType: WorldTileType): bool =
+    return tileType == wttSlopeRight or tileType == wttSlopeFront or tileType ==
+            wttSlopeLeft or tileType == wttSlopeBack
+
 proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent, direction: Direction, tileMove: int8) =
     let entityHere = reg.getTileAt(pos.x, pos.y, pos.z)
@@ -149,9 +153,17 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
     let entityForward = reg.getForward(pos, direction)
     if entityForward.isNone() or reg.getComponent[:WorldTileComponent](
                 entityForward.get()).tileType == wttEnding:
+        let entityUnder = reg.standingOn(pos)
         let directionTuple = getDirectionTuple(direction)
-        pos.x += directionTuple.x
-        pos.y += directionTuple.y
+        if entityUnder.isSome() and isSlope(reg.getComponent[:
+                WorldTileComponent](entityUnder.get()).tileType):
+            if reg.getTileAt(pos.x+directionTuple.x, pos.y+directionTuple.y,
+                    +pos.z-1).isNone():
+                pos.x += directionTuple.x
+                pos.y += directionTuple.y
+        else:
+            pos.x += directionTuple.x
+            pos.y += directionTuple.y
     else:
         let forwardTileType = reg.getComponent[:WorldTileComponent](
                 entityForward.get()).tileType
