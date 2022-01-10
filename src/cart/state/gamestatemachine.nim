@@ -132,6 +132,7 @@ proc buildLevel*(s: LevelState) =
                     s.reg.addComponent(e, SpriteComponent(sprite: oSprite.get()))
                     s.reg.addComponent(e, PositionComponent(x: int8(i), y: int8(
                             j), z: int8(k)))
+                    s.reg.addComponent(e, PhysicsComponent())
                     if tt == wttStarting:
                         s.createDangoAt(int8(i), int8(j), int8(k + 1))
                         s.reg.addComponent(e, WorldTileComponent(
