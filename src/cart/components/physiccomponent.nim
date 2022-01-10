@@ -1,8 +1,9 @@
 import std/options
 import ../events/eventqueue
 import ../ecs/ecs
-import ../components/positioncomponent
-import ../components/worldtilecomponent
+import positioncomponent
+import worldtilecomponent
+import observercomponent
 
 type
     Direction* = enum
@@ -13,13 +14,6 @@ type
     MovementMessage* = enum mmMoveRight, mmMoveFront, mmMoveLeft, mmMoveBack
     MovementTopic* = Topic[MovementMessage]
     MovementEventQueue* = EventQueue[MovementMessage]
-    ObserverPunchMessageEnum* = enum opmPunchRight, opmPunchFront, opmPunchLeft, opmPunchBack
-    ObserverPunchMessage* = object
-        message*: ObserverPunchMessageEnum
-        entityObserved*: uint32
-        positionObserved*: PositionComponent
-    ObserverPunchTopic* = Topic[ObserverPunchMessage]
-    ObserverPunchEventQueue* = EventQueue[ObserverPunchMessage]
     PhysicsComponent* = ref object of Component
         velocity*: Velocity
         eventQueue*: MovementEventQueue
@@ -107,6 +101,18 @@ proc getTileVelocity(tile: WorldTileComponent): Velocity =
     else:
         return Velocity(x: 0, y: 0)
 
+proc getPunchBlockDirection(tileType: WorldTileComponent): Direction =
+    case tileType.tileType
+    of wttPunchRight:
+        return dRight
+    of wttPunchFront:
+        return dFront
+    of wttPunchLeft:
+        return dLeft
+    of wttPunchBack:
+        return dBack
+    else: return dNone
+
 proc processTileFriction(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
     let entityUnder = reg.standingOn(pos)
@@ -122,8 +128,8 @@ proc processGravity(reg: Registry, pos: PositionComponent) =
     if entityUnder.isNone():
         pos.z.dec
 
-proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
-        direction: Direction, tileMove: int8) =
+proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
+        phy: PhysicsComponent, direction: Direction, tileMove: int8) =
     let entityHere = reg.getTileAt(pos.x, pos.y, pos.z)
     if entityHere.isSome():
         let hereTileType = reg.getComponent[:WorldTileComponent](
@@ -192,7 +198,8 @@ proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
                         entityForward.get(), PositionComponent, PhysicsComponent)
                 if reg.getTileAt(forwardPos.x, forwardPos.y,
                         forwardPos.z+1).isNone():
-                    moveOneTile(reg, forwardPos, forwardPhy, direction, tileMove-1)
+                    moveOneTile(reg, entityForward.get(), forwardPos,
+                            forwardPhy, direction, tileMove-1)
                     let directionTuple = getDirectionTuple(direction)
                     if reg.getForward(pos, direction).isNone():
                         pos.x += directionTuple.x
@@ -200,6 +207,16 @@ proc moveOneTile(reg: Registry, pos: PositionComponent, phy: PhysicsComponent,
                     phy.velocity = Velocity(x: 0, y: 0)
             else:
                 phy.velocity = Velocity(x: 0, y: 0)
+    if reg.hasAllComponents(entity, ObserverComponent, PositionComponent,
+            WorldTileComponent):
+        let (pos, obs, worldTileComponent) = reg.getComponents(entity,
+                PositionComponent, ObserverComponent, WorldTileComponent)
+        for position in obs.positionObserving:
+            if direction == dNone:
+                let directionTuple = getDirectionTuple(getPunchBlockDirection(worldTileComponent))
+                position.x = pos.x + directionTuple.x
+                position.y = pos.y + directionTuple.y
+                position.z = pos.z
 
 proc processMirror(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
@@ -219,13 +236,13 @@ proc processMirror(reg: Registry, pos: PositionComponent,
         else:
             return
 
-proc processVelocityMovement(reg: Registry, pos: PositionComponent,
-        phy: PhysicsComponent) =
+proc processVelocityMovement(reg: Registry, entity: Entity,
+        pos: PositionComponent, phy: PhysicsComponent) =
     processMirror(reg, pos, phy)
     let direction = getDirection(phy.velocity)
-    moveOneTile(reg, pos, phy, direction, getAbsoluteVelocity(phy.velocity))
+    moveOneTile(reg, entity, pos, phy, direction, getAbsoluteVelocity(phy.velocity))
 
-proc processEventQueue(reg: Registry, pos: PositionComponent,
+proc processEventQueue(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent) =
     if phy.eventQueue != nil:
         let direction = getDirection(phy.velocity)
@@ -234,19 +251,19 @@ proc processEventQueue(reg: Registry, pos: PositionComponent,
             if m.isSome():
                 case (m.get())
                 of mmMoveBack:
-                    moveOneTile(reg, pos, phy, dBack, 1)
+                    moveOneTile(reg, entity, pos, phy, dBack, 1)
                 of mmMoveFront:
-                    moveOneTile(reg, pos, phy, dFront, 1)
+                    moveOneTile(reg, entity, pos, phy, dFront, 1)
                 of mmMoveLeft:
-                    moveOneTile(reg, pos, phy, dLeft, 1)
+                    moveOneTile(reg, entity, pos, phy, dLeft, 1)
                 of mmMoveRight:
-                    moveOneTile(reg, pos, phy, dRight, 1)
+                    moveOneTile(reg, entity, pos, phy, dRight, 1)
         phy.eventQueue.clearQueue()
 
-proc processMovement(reg: Registry, pos: PositionComponent,
+proc processMovement(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent) =
-    reg.processEventQueue(pos, phy)
-    reg.processVelocityMovement(pos, phy)
+    reg.processEventQueue(entity, pos, phy)
+    reg.processVelocityMovement(entity, pos, phy)
 
 proc processPunch(reg: Registry, direction: Direction, pos: PositionComponent,
         phy: PhysicsComponent) =
@@ -293,10 +310,11 @@ proc processObserver(reg: Registry) =
 
 proc physicsSystem*(reg: Registry) =
     processObserver(reg)
-    for (pos, phy) in reg.entitiesWithComponents(PositionComponent,
+    for entity in reg.entitiesWith(PositionComponent,
             PhysicsComponent):
+        let (pos, phy) = reg.getComponents(entity, PositionComponent, PhysicsComponent)
         if pos.z > 0:
-            processMovement(reg, pos, phy)
+            processMovement(reg, entity, pos, phy)
             processTileFriction(reg, pos, phy)
             processGravity(reg, pos)
             let entityUnder = reg.standingOn(pos)
