@@ -94,6 +94,7 @@ proc createDangoAt(s: LevelState, i, j, k: int8) =
         physicTopic: inputTopic, gameTopic: s.gameTopic))
     s.reg.addComponent(dango, phyComponent)
     s.reg.addComponent(dango, PlayerComponent(gameTopic: s.gameTopic))
+    s.reg.addComponent(dango, WorldTileComponent(tileType: wttTile))
 
 proc addPunchObserver(reg: Registry, entity: Entity, punchType: ObserverType, i,
         j, k: int8) =
@@ -132,6 +133,7 @@ proc buildLevel*(s: LevelState) =
                     s.reg.addComponent(e, SpriteComponent(sprite: oSprite.get()))
                     s.reg.addComponent(e, PositionComponent(x: int8(i), y: int8(
                             j), z: int8(k)))
+                    s.reg.addComponent(e, PhysicsComponent())
                     if tt == wttStarting:
                         s.createDangoAt(int8(i), int8(j), int8(k + 1))
                         s.reg.addComponent(e, WorldTileComponent(
