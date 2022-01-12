@@ -332,7 +332,68 @@ function draw() {
   showTileType();
 }
 
+function getTileSymbols() {
+  let out = [];
+  for (let i = 0; i <= 16; ++i) {
+    out.push(i);
+  }
+  return out;
+}
+
+function getProbabilities(symbols, data) {
+  return []; // TODO
+}
+
+function zip(xs, ys) {
+  return xs.map((x, i) => [x, ys[i]]);
+}
+
+function popNextNode(q1, q2) {
+  let x = [Infinity, Infinity];
+  let y = [Infinity, Infinity];
+
+  if (q1.length > 0) {
+    x = q1[0];
+  }
+  if (q2.length > 0) {
+    y = q2[0];
+  }
+
+  if (x[1] < y[1]) {
+    return [x, q1.slice(1), q2];
+  } else {
+    return [y, q1, q2.slice(1)];
+  }
+}
+
+function huffmanCode(symbols, probs) {
+  let nodes = zip(symbols, probs);
+  nodes.sort((a, b) => a[1] - b[1]);
+  let q1 = []
+  let q2 = []
+  for (let i = 0; i < nodes.length; ++i) {
+    q1.push(nodes[i]);
+  }
+  
+  while (q1.length + q2.length > 1) {
+    let x, q1_prime, q2_prime, y, q1_prime_prime, q2_prime_prime
+    [x, q1_prime, q2_prime] = popNextNode(q1, q2);
+    [y, q1_prime_prime, q2_prime_prime] = popNextNode(q1_prime, q2_prime);
+    let n = [[y[0], x[0]], x[1] + y[1]];
+
+    q1 = q1_prime_prime;
+    q2 = q2_prime_prime;
+
+    q2.push(n);
+  }
+
+  let root = popNextNode(q1, q2)[0][0];
+  return root;
+}
+
 function exportWorld() {
+  console.log(huffmanCode(['a', 'b', 'c'], [0.10, 0.3, 0.4]));
+
   var output = "";
   output += "import ../../components/worldtilecomponent<br/><br/>"
   output += `const worldXSize: int8 = ${WORLD_SIZE}<br/>`
