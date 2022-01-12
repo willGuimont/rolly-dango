@@ -11,7 +11,6 @@ import cart/components/inputcomponent
 import cart/components/playercomponent
 import cart/components/animationcomponent
 import cart/systems/observersystem
-import cart/assets/levels/testlevel08
 import cart/assets/levels/testlevel10
 import cart/input/gamepad
 import cart/state/gamestatemachine
@@ -22,9 +21,6 @@ proc NimMain {.importc.}
 
 var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
-var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
-    z: int32(6))
-var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
 var frameCount: int = 0
 var sm: StateMachine[LevelState]
 
@@ -35,10 +31,15 @@ var isEndingScreen = false
 var dangoVelocity*: ref Velocity
 
 proc position_to_iso(position: PositionComponent): tuple[x: int32, y: int32] =
-  var iso_x: int32 = int32(position.x) * -decal.x + int32(position.y)*decal.x +
-      int32(position.z)*0 + origin.x
-  var iso_y: int32 = int32(position.x) * decal.y + int32(position.y) * decal.y +
-      int32(position.z) * -decal.z + origin.y
+  const decalX = 7
+  const decalY = 4
+  const decalZ = 6
+  const originX = 76
+  const originY = 40
+  var iso_x: int32 = int32(position.x) * -decalX + int32(position.y)*decalX +
+      int32(position.z)*0 + originX
+  var iso_y: int32 = int32(position.x) * decalY + int32(position.y) * decalY +
+      int32(position.z) * -decalZ + originY
   return (x: iso_x, y: isoY)
 
 proc render(reg: Registry) =

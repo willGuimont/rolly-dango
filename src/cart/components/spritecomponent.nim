@@ -17,7 +17,7 @@ macro makeSprite*(data: untyped): untyped =
     let sprite = ident($data & "Sprite")
 
     return quote do:
-        var `sprite`* = Sprite(
+        let `sprite`* = Sprite(
                 width: `width`, height: `height`,
                 flags: `flags`, data: unsafeAddr `data`)
 
