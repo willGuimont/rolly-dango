@@ -70,7 +70,7 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(reg, theGamepad, @[tlevel10, tlevel08])
+  let level = newLevelList(reg, theGamepad, @[tlevel10])
   sm = newStateMachine(level.get())
 
 proc setPalette() =
