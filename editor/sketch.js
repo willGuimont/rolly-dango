@@ -335,12 +335,14 @@ function draw() {
 function getTileSymbols() {
   let out = [];
   for (let i = 0; i <= 16; ++i) {
-    out.push(i);
+    out.push(i); // TODO only if in world
+    console.log('TODO HERE');
   }
   return out;
 }
 
 function getProbabilities(symbols, data) {
+  console.log('TODO HERE');
   return []; // TODO
 }
 
@@ -391,8 +393,35 @@ function huffmanCode(symbols, probs) {
   return root;
 }
 
+function compressSymbol(codec, symbol, compressed='') {
+  while (true) {
+    if (symbol == codec[0]) {
+      compressed += '0';
+      return compressed;
+    } else if (symbol == codec[1]) {
+      compressed += '1';
+      return compressed;
+    }
+
+    if (Array.isArray(codec[0])) {
+      compressed += '0';
+      return compressSymbol(codec[0], symbol, compressed);
+    } else if (Array.isArray(codec[1])) {
+      compressed += '1';
+      return compressSymbol(codec[1], symbol, compressed);
+    } else {
+      throw "Symbol not in codec";
+    }
+  }
+}
+
+function compress(codec, data) {
+  return data.split("").map(x => compressSymbol(codec, x)).join('')
+}
+
 function exportWorld() {
-  console.log(huffmanCode(['a', 'b', 'c'], [0.10, 0.3, 0.4]));
+  let codec = huffmanCode(['a', 'b', 'c'], [0.10, 0.3, 0.4]);
+  console.log(compressSymbol(codec, 'a'));
 
   var output = "";
   output += "import ../../components/worldtilecomponent<br/><br/>"
