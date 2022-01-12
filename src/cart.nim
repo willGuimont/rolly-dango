@@ -10,7 +10,15 @@ import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
 import cart/systems.observersystem
+import cart/assets/levels/testlevel01
+import cart/assets/levels/testlevel02
+import cart/assets/levels/testlevel03
+import cart/assets/levels/testlevel04
+import cart/assets/levels/testlevel05
+import cart/assets/levels/testlevel06
+import cart/assets/levels/testlevel07
 import cart/assets/levels/testlevel08
+import cart/assets/levels/testlevel09
 import cart/assets/levels/testlevel10
 import cart/input/gamepad
 import cart/state/gamestatemachine
@@ -21,9 +29,9 @@ proc NimMain {.importc.}
 
 var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
-var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
+const decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
-var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
+const origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
 var frameCount: int = 0
 var sm: StateMachine[LevelState]
 
@@ -69,7 +77,8 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(reg, theGamepad, @[tlevel10, tlevel08])
+  let level = newLevelList(reg, theGamepad, @[tlevel01, tlevel02, tlevel03,
+      tlevel04, tlevel05, tlevel06, tlevel07, tlevel08, tlevel09, tlevel10])
   sm = newStateMachine(level.get())
 
 proc setPalette() =
