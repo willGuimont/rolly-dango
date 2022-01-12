@@ -9,7 +9,7 @@ import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
-import cart/systems.observersystem
+import cart/systems/observersystem
 import cart/assets/levels/testlevel01
 import cart/assets/levels/testlevel02
 import cart/assets/levels/testlevel03

@@ -335,9 +335,9 @@ function draw() {
 function exportWorld() {
   var output = "";
   output += "import ../../components/worldtilecomponent<br/><br/>"
-  output += `const worldXSize: int = ${WORLD_SIZE}<br/>`
-  output += `const worldYSize: int = ${WORLD_SIZE}<br/>`
-  output += `const worldZSize: int = ${WORLD_HEIGHT}<br/>`
+  output += `const worldXSize: int8 = ${WORLD_SIZE}<br/>`
+  output += `const worldYSize: int8 = ${WORLD_SIZE}<br/>`
+  output += `const worldZSize: int8 = ${WORLD_HEIGHT}<br/>`
   output += `const worldData: array[${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}, uint8] = [`
 
   var firstTile = true;

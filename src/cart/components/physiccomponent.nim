@@ -18,7 +18,7 @@ type
         velocity*: Velocity
         eventQueue*: MovementEventQueue
 
-let PUNCH_VELOCITY_INCREASE: int8 = 3
+const PUNCH_VELOCITY_INCREASE: int8 = 3
 let observerEventQueue*: ObserverPunchEventQueue = ObserverPunchEventQueue()
 
 proc newPhysicsComponent*(velocity: Velocity): PhysicsComponent =
@@ -52,7 +52,6 @@ proc getForward(reg: Registry, pos: PositionComponent,
     let directionTuple = getDirectionTuple(direction)
     return reg.getTileAt(pos.x + directionTuple.x, pos.y + directionTuple.y, pos.z)
 
-
 proc getAbsoluteVelocity(vel: Velocity): int8 =
     return abs(vel.x + vel.y)
 
@@ -82,7 +81,6 @@ proc transfertVelocity(vel: Velocity, direction: Direction): Velocity =
         return Velocity(x: -abs(value), y: 0)
     else:
         return Velocity(x: 0, y: 0)
-
 
 proc tileFriction(phy: PhysicsComponent): Velocity =
     let direction = getDirectionTuple(getDirection(phy.velocity))

@@ -1,8 +1,8 @@
 import ../../components/worldtilecomponent
 
-const worldXSize: int = 10
-const worldYSize: int = 10
-const worldZSize: int = 5
+const worldXSize: int8 = 10
+const worldYSize: int8 = 10
+const worldZSize: int8 = 5
 const worldData: array[500, uint8] = [1'u8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

@@ -10,13 +10,13 @@ type
   WorldTileComponent* = ref object of Component
     tileType*: WorldTileType
   Level*[T] = object
-    x*: int
-    y*: int
-    z*: int
+    x*: int8
+    y*: int8
+    z*: int8
     data*: ptr T
 
 macro makeLevel*(name: untyped): untyped =
   return quote do:
-    const worldSize = worldXSize * worldYSize * worldZSize
+    const worldSize = int(worldXSize) * int(worldYSize) * int(worldZSize)
     let `name`* = Level[array[worldSize, uint8]](x: worldXSize, y: worldYSize,
         z: worldZSize, data: unsafeAddr worldData)
