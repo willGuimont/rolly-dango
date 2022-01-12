@@ -230,6 +230,6 @@ makeAnimationFrame(iddleAnimRight2, 1)
 makeAnimationFrame(iddleAnimRight3, 1)
 makeAnimationFrame(iddleAnimRight4, 1)
 
-let idleAnimation = Animation(frames: @[iddleAnimRight1AnimFrame,
+let idleAnimation* = Animation(frames: @[iddleAnimRight1AnimFrame,
     iddleAnimRight2AnimFrame, iddleAnimRight3AnimFrame,
     iddleAnimRight4AnimFrame])

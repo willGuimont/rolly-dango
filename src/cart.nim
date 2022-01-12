@@ -9,6 +9,7 @@ import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
+import cart/components/animationcomponent
 import cart/systems/observersystem
 import cart/assets/levels/testlevel08
 import cart/assets/levels/testlevel10
@@ -107,6 +108,7 @@ proc runGame() =
   if (frameCount mod 15) == 0:
     reg.processObservers()
     reg.physicsSystem()
+    reg.animationSystem(frameCount)
 
 proc update {.exportWasm.} =
   if isTitleScreen:

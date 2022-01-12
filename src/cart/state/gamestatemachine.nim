@@ -9,6 +9,7 @@ import ../components/inputcomponent
 import ../components/worldtilecomponent
 import ../components/playercomponent
 import ../components/observercomponent
+import ../components/animationcomponent
 import ../input/gamepad
 import levelstateevents
 
@@ -95,6 +96,7 @@ proc createDangoAt(s: LevelState, i, j, k: int8) =
     s.reg.addComponent(dango, phyComponent)
     s.reg.addComponent(dango, PlayerComponent(gameTopic: s.gameTopic))
     s.reg.addComponent(dango, WorldTileComponent(tileType: wttTile))
+    s.reg.addComponent(dango, newAnimationComponent(idleAnimation))
 
 proc addPunchObserver(reg: Registry, entity: Entity, punchType: ObserverType, i,
         j, k: int8) =

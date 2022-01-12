@@ -20,3 +20,5 @@ macro makeSprite*(data: untyped): untyped =
         var `sprite`* = Sprite(
                 width: `width`, height: `height`,
                 flags: `flags`, data: unsafeAddr `data`)
+
+
