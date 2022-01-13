@@ -481,7 +481,8 @@ function exportWorld() {
   // TODO generate compressed array
 
   var output = "";
-  output += "import ../../components/worldtilecomponent<br/><br/>"
+  output += "import ../../components/worldtilecomponent<br/>"
+  output += "import ../../bintree/bintree<br/><br/>"
   output += `const worldXSize: int8 = ${WORLD_SIZE}<br/>`
   output += `const worldYSize: int8 = ${WORLD_SIZE}<br/>`
   output += `const worldZSize: int8 = ${WORLD_HEIGHT}<br/>`
