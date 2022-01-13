@@ -473,10 +473,12 @@ function exportWorld() {
 
   let compressed = compressData(codec, data);
 
-
   console.log('compressed');
   console.log(compressed);
   console.log(compressed.length);
+
+  // TODO find a way to flatten codec into a list
+  // TODO generate compressed array
 
   var output = "";
   output += "import ../../components/worldtilecomponent<br/><br/>"
