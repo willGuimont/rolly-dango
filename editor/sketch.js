@@ -379,7 +379,13 @@ function huffmanCode(symbols, probs) {
     let x, q1_prime, q2_prime, y, q1_prime_prime, q2_prime_prime
     [x, q1_prime, q2_prime] = popNextNode(q1, q2);
     [y, q1_prime_prime, q2_prime_prime] = popNextNode(q1_prime, q2_prime);
-    let n = [[y[0], x[0]], x[1] + y[1]];
+    let n;
+
+    if (Array.isArray(x[0])) {
+      n = [[y[0], x[0]], x[1] + y[1]]
+    } else {
+      n = [[x[0], y[0]], x[1] + y[1]]
+    }
 
     q1 = q1_prime_prime;
     q2 = q2_prime_prime;
@@ -391,8 +397,19 @@ function huffmanCode(symbols, probs) {
   return root;
 }
 
+function flattenCodec(codec, output=[]) {
+  output.push(codec[0]);
+  if (Array.isArray(codec[1]))
+    output = output.concat(flattenCodec(codec[1]));
+  else
+    output.push(codec[1]);
+  return output;
+}
+
 function exportWorld() {
-  console.log(huffmanCode(['a', 'b', 'c'], [0.10, 0.3, 0.4]));
+  let codec = huffmanCode(['a', 'b', 'c', 'd'], [0.40, 0.3, 0.4, 0.05]);
+  console.log(codec);
+  console.log(flattenCodec(codec));
 
   var output = "";
   output += "import ../../components/worldtilecomponent<br/><br/>"
