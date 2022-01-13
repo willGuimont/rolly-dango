@@ -101,7 +101,7 @@ function drawSlope() {
 
 function drawPunch() {
   scale(0.3);
-  rotateZ(PI/2);
+  rotateZ(PI / 2);
   cone(40, 70);
 }
 
@@ -137,7 +137,7 @@ function drawTile(tile) {
     drawSlope();
   } else if (tile == TILE_MIRROR_BACK) {
     rotateX(PI / 2);
-    rotateY(-4*PI/2);
+    rotateY(-4 * PI / 2);
     drawSlope();
   } else if (tile == TILE_PUNCH_FRONT) {
     rotateX(3 * PI / 2);
@@ -145,11 +145,11 @@ function drawTile(tile) {
     drawPunch();
   } else if (tile == TILE_PUNCH_RIGHT) {
     rotateX(PI / 2);
-    rotateY(-2*PI/2);
+    rotateY(-2 * PI / 2);
     drawPunch();
   } else if (tile == TILE_PUNCH_LEFT) {
     rotateX(PI / 2);
-    rotateY(-4*PI/2);
+    rotateY(-4 * PI / 2);
     drawPunch();
   } else if (tile == TILE_PUNCH_BACK) {
     rotateX(PI / 2);
@@ -333,15 +333,38 @@ function draw() {
 }
 
 function getTileSymbols() {
-  let out = [];
-  for (let i = 0; i <= 16; ++i) {
-    out.push(i);
+  let out = new Set();
+
+  for (let z = 0; z < WORLD_HEIGHT; z++) {
+    for (let x = 0; x < WORLD_SIZE; x++) {
+      for (let y = 0; y < WORLD_SIZE; y++) {
+        out.add(world[x][y][z]);
+      }
+    }
   }
-  return out;
+
+  return Array.from(out);
 }
 
-function getProbabilities(symbols, data) {
-  return []; // TODO
+function getOccurences(symbols, data) {
+  let count = new Map();
+
+  for (let i = 0; i < data.length; i++) {
+    if (count.get(data[i]) == undefined) {
+      count.set(data[i], 1);
+    } else {
+      count.set(data[i], count.get(data[i]) + 1);
+    }
+  }
+
+  let out = [];
+
+  for (let i = 0; i < symbols.length; ++i) {
+    let s = symbols[i];
+    out.push(count.get(s));
+  }
+
+  return out;
 }
 
 function zip(xs, ys) {
@@ -374,18 +397,12 @@ function huffmanCode(symbols, probs) {
   for (let i = 0; i < nodes.length; ++i) {
     q1.push(nodes[i]);
   }
-  
+
   while (q1.length + q2.length > 1) {
     let x, q1_prime, q2_prime, y, q1_prime_prime, q2_prime_prime
     [x, q1_prime, q2_prime] = popNextNode(q1, q2);
     [y, q1_prime_prime, q2_prime_prime] = popNextNode(q1_prime, q2_prime);
-    let n;
-
-    if (Array.isArray(x[0])) {
-      n = [[y[0], x[0]], x[1] + y[1]]
-    } else {
-      n = [[x[0], y[0]], x[1] + y[1]]
-    }
+    let n = [[x[0], y[0]], x[1] + y[1]]
 
     q1 = q1_prime_prime;
     q2 = q2_prime_prime;
@@ -397,19 +414,69 @@ function huffmanCode(symbols, probs) {
   return root;
 }
 
-function flattenCodec(codec, output=[]) {
-  output.push(codec[0]);
-  if (Array.isArray(codec[1]))
-    output = output.concat(flattenCodec(codec[1]));
-  else
-    output.push(codec[1]);
+function compressSymbol(codec, symbol, compressed = '') {
+  if (symbol === codec) {
+    compressed += '0';
+    return compressed;
+  }
+
+  if (symbol === codec[0]) {
+    compressed = compressed.concat('0');
+    return compressed;
+  } else if (symbol === codec[1]) {
+    compressed = compressed.concat('1');
+    return compressed;
+  }
+
+  if (Array.isArray(codec[0])) {
+    let c = compressSymbol(codec[0], symbol, compressed);
+    if (c !== '') {
+      compressed = compressed.concat('0', c);
+      return compressed;
+    }
+  }
+
+  if (Array.isArray(codec[1])) {
+    let c = compressSymbol(codec[1], symbol, compressed);
+    if (c !== '') {
+      compressed = compressed.concat('1', c);
+      return compressed;
+    }
+  }
+  return '';
+}
+
+function compressData(codec, data) {
+  return data.map(x => compressSymbol(codec, x)).join('')
+}
+
+function flattenWorld() {
+  let output = [];
+  for (let z = 0; z < WORLD_HEIGHT; z++) {
+    for (let x = 0; x < WORLD_SIZE; x++) {
+      for (let y = 0; y < WORLD_SIZE; y++) {
+        output.push(world[x][y][z]);
+      }
+    }
+  }
   return output;
 }
 
 function exportWorld() {
-  let codec = huffmanCode(['a', 'b', 'c', 'd'], [0.40, 0.3, 0.4, 0.05]);
+  let data = flattenWorld();
+  let symbols = getTileSymbols();
+  let occ = getOccurences(symbols, data);
+  let codec = huffmanCode(symbols, occ);
+
+  console.log('codec');
   console.log(codec);
-  console.log(flattenCodec(codec));
+
+  let compressed = compressData(codec, data);
+
+
+  console.log('compressed');
+  console.log(compressed);
+  console.log(compressed.length);
 
   var output = "";
   output += "import ../../components/worldtilecomponent<br/><br/>"
