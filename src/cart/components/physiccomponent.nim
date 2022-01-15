@@ -4,6 +4,7 @@ import ../ecs/ecs
 import positioncomponent
 import worldtilecomponent
 import observercomponent
+import ../wasm4
 
 type
     Direction* = enum
@@ -252,6 +253,10 @@ proc processVelocityMovement(reg: Registry, entity: Entity,
     let direction = getDirection(phy.velocity)
     moveOneTile(reg, entity, pos, phy, direction, getAbsoluteVelocity(phy.velocity))
 
+proc playMoveSound() =
+    tone(120 or (200 shl 16), (8 shl 24) or (4 shl 16) or (6 shl 0) or (
+            4 shl 8), 100, TONE_PULSE1)
+
 proc processEventQueue(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent) =
     if phy.eventQueue != nil:
@@ -259,6 +264,7 @@ proc processEventQueue(reg: Registry, entity: Entity, pos: PositionComponent,
         if direction == dNone and reg.standingOn(pos).isSome():
             let m = phy.eventQueue.popMessage()
             if m.isSome():
+                playMoveSound()
                 case (m.get())
                 of mmMoveBack:
                     moveOneTile(reg, entity, pos, phy, dBack, 1)
