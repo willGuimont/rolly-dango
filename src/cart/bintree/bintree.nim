@@ -3,11 +3,11 @@ type
         left, right: BinaryTree[T]
         data: T
 
-proc newLeaf*[T](data: T) =
-    return BinaryTree(data: data)
+proc newLeaf*[T](data: T): BinaryTree[T] =
+    return BinaryTree[T](data: data)
 
-proc newNode*[T](left, right: BinaryTree[T]) = 
-    return BinaryTree(left: left, right: right)
+proc newNode*[T](left, right: BinaryTree[T]): BinaryTree[T] =
+    return BinaryTree[T](left: left, right: right)
 
 proc isLeaf*[T](node: BinaryTree[T]): bool =
     return node.data != nil

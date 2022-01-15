@@ -1,5 +1,6 @@
 import std/macros
 import ../ecs/ecs
+import ../bintree/bintree
 
 type
   WorldTileType* = enum
@@ -20,3 +21,7 @@ macro makeLevel*(name: untyped): untyped =
     const worldSize = int(worldXSize) * int(worldYSize) * int(worldZSize)
     let `name`* = Level[array[worldSize, uint8]](x: worldXSize, y: worldYSize,
         z: worldZSize, data: unsafeAddr worldData)
+
+proc decompressLevel*(data: openArray[uint8], codec: BinaryTree[uint8]): Level[
+    array[500, uint8]] =
+  echo "a"

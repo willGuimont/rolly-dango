@@ -473,12 +473,12 @@ function exportWorld() {
 
   let compressed = compressData(codec, data);
 
-  console.log('compressed');
-  console.log(compressed);
-  console.log(compressed.length);
+  let compressedSize = Math.ceil(compressed.length / 8.0);
+  let numPadding = 8 * compressedSize - compressed.length;
 
-  // TODO find a way to flatten codec into a list
-  // TODO generate compressed array
+  for (let i = 0; i < numPadding; ++i) {
+    compressed = compressed.concat('0');
+  }
 
   var output = "";
   output += "import ../../components/worldtilecomponent<br/>"
@@ -486,27 +486,25 @@ function exportWorld() {
   output += `const worldXSize: int8 = ${WORLD_SIZE}<br/>`
   output += `const worldYSize: int8 = ${WORLD_SIZE}<br/>`
   output += `const worldZSize: int8 = ${WORLD_HEIGHT}<br/>`
-  output += `const worldData: array[${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}, uint8] = [`
+  output += `let codec: BinaryTree[uint8] = newLeaf[uint8](1)  # TODO add codec here<br/>`
+  output += `const worldData: array[${compressedSize}, uint8] = [`
 
   var firstTile = true;
 
-  for (let z = 0; z < WORLD_HEIGHT; z++) {
-    for (let x = 0; x < WORLD_SIZE; x++) {
-      for (let y = 0; y < WORLD_SIZE; y++) {
-        output += world[x][y][z]
-        if (firstTile) {
-          output += "'u8";
-          firstTile = false;
-        }
-        let isLast = z == WORLD_HEIGHT - 1 && x == WORLD_SIZE - 1 && y == WORLD_SIZE - 1
-        if (!isLast) {
-          output += ", "
-        }
-      }
+  for (let i = 0; i < compressedSize; i++) {
+    output = output.concat(`0b${compressed.slice(i * 8, (i + 1) * 8)}`)
+
+    if (firstTile) {
+      output += "'u8";
+      firstTile = false;
+    }
+    let isLast = i === compressedSize - 1;
+    if (!isLast) {
+      output += ", "
     }
   }
   output += "]<br/><br/>"
-  output += "makeLevel(TODO_INSERT_LEVEL_NAME)<br/><br/>"
+  output += "let TODO_LEVEL_NAME = decompressLevel(worldData, codec)<br/><br/>"
 
   select("#exported").html(output);
 }

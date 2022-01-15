@@ -20,6 +20,7 @@ import cart/assets/levels/testlevel07
 import cart/assets/levels/testlevel08
 import cart/assets/levels/testlevel09
 import cart/assets/levels/testlevel10
+import cart/assets/levels/compressed01
 import cart/input/gamepad
 import cart/state/gamestatemachine
 
@@ -77,11 +78,7 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(reg, theGamepad, @[unsafeAddr tlevel01,
-    unsafeAddr tlevel02, unsafeAddr tlevel03,
-    unsafeAddr tlevel04, unsafeAddr tlevel05, unsafeAddr tlevel06,
-    unsafeAddr tlevel07, unsafeAddr tlevel08, unsafeAddr tlevel09,
-    unsafeAddr tlevel10])
+  let level = newLevelList(reg, theGamepad, @[unsafeAddr compressed01])
   sm = newStateMachine(level.get())
 
 proc setPalette() =
