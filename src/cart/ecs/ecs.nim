@@ -74,7 +74,7 @@ proc getComponent*[T](reg: Registry, entity: Entity): T =
     # raise newException(ValueError, "Entity " & $entity & " is not a valid entity")
     return nil
   if not reg.components[componentHash].hasKey(entity):
-    let message = "Entity " & $entity & " has not component of type " & $T
+    # let message = "Entity " & $entity & " has not component of type " & $T
     # raise newException(ValueError, message)
     return nil
   return (T)reg.components[componentHash][entity]
