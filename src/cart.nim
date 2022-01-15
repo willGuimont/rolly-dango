@@ -11,7 +11,7 @@ import cart/components/inputcomponent
 import cart/components/playercomponent
 import cart/systems.observersystem
 import cart/assets/levels/testlevel08
-import cart/assets/levels/testlevel10
+import cart/assets/levels/testlevel11
 import cart/input/gamepad
 import cart/state/gamestatemachine
 
@@ -69,7 +69,7 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(reg, theGamepad, @[tlevel10, tlevel08])
+  let level = newLevelList(reg, theGamepad, @[tlevel11, tlevel08])
   sm = newStateMachine(level.get())
 
 proc setPalette() =

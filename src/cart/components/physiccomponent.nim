@@ -35,6 +35,16 @@ proc getTileAt(reg: Registry, x: int8, y: int8, z: int8): Option[Entity] =
 proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
     return reg.getTileAt(pos.x, pos.y, pos.z-1)
 
+proc getMirrorAt(reg: Registry, x: int8, y: int8, z: int8): Option[Entity] =
+    for e in reg.entitiesWith(PositionComponent, WorldTileComponent):
+        let (tpos, twtt) = reg.getComponents(e, PositionComponent, WorldTileComponent)
+        if tpos.x == x and tpos.y == y and tpos.z == z and (twtt.tileType ==
+                wttMirrorRight or twtt.tileType == wttMirrorFront or
+                twtt.tileType == wttMirrorLeft or twtt.tileType ==
+                wttMirrorBack):
+            return some(e)
+    return none(Entity)
+
 proc getDirectionTuple(direction: Direction): tuple[x: int8, y: int8] =
     case direction
     of Direction.dRight:
@@ -160,7 +170,7 @@ proc isSlope(tileType: WorldTileType): bool =
 
 proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent, direction: Direction, tileMove: int8) =
-    let entityHere = reg.getTileAt(pos.x, pos.y, pos.z)
+    let entityHere = reg.getMirrorAt(pos.x, pos.y, pos.z)
     if entityHere.isSome():
         let hereTileType = reg.getComponent[:WorldTileComponent](
                 entityHere.get()).tileType
@@ -303,7 +313,7 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
 
 proc processMirror(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
-    let entityHere = reg.getTileAt(pos.x, pos.y, pos.z)
+    let entityHere = reg.getMirrorAt(pos.x, pos.y, pos.z)
     if entityHere.isSome():
 
         case reg.getComponent[:WorldTileComponent](
