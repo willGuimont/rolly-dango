@@ -1,13 +1,22 @@
 type
-    BinaryTree*[T] = ref object
-        left, right: BinaryTree[T]
-        data: T
+    BinaryTree* = ref object
+        left, right: BinaryTree
+        data: int8
 
-proc newLeaf*[T](data: T): BinaryTree[T] =
-    return BinaryTree[T](data: data)
+proc newLeaf*(data: int8): BinaryTree =
+    return BinaryTree(data: data)
 
-proc newNode*[T](left, right: BinaryTree[T]): BinaryTree[T] =
-    return BinaryTree[T](left: left, right: right)
+proc newNode*(left, right: BinaryTree): BinaryTree =
+    return BinaryTree(left: left, right: right, data: -1)
 
-proc isLeaf*[T](node: BinaryTree[T]): bool =
-    return node.data != nil
+proc isLeaf*(node: BinaryTree): bool =
+    return node.data != -1
+
+proc getData*(node: BinaryTree): int8 =
+    return node.data
+
+proc getLeft*(node: BinaryTree): BinaryTree =
+    return node.left
+
+proc getRight*(node: BinaryTree): BinaryTree =
+    return node.right

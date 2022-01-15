@@ -18,15 +18,15 @@ type
         needsToTransition: bool
         reg*: Registry
         gamepad: Gamepad
-        levelData*: ptr Level[array[500, uint8]]
+        levelData*: ref Level
         wasBuilt*: bool
         eventQueue: GameEventQueue
         gameTopic: Topic[GameMessage]
     StateMachine*[T] = object
         currentState: T
 
-proc newLevelState*(reg: Registry, g: Gamepad, level: ptr Level[array[500,
-        uint8]], nextState: Option[LevelState]): LevelState =
+proc newLevelState*(reg: Registry, g: Gamepad, level: ref Level,
+        nextState: Option[LevelState]): LevelState =
     let eventQueue = newEventQueue[GameMessage]()
     var gameTopic = newTopic[GameMessage]()
     eventQueue.followTopic(gameTopic)
@@ -34,14 +34,13 @@ proc newLevelState*(reg: Registry, g: Gamepad, level: ptr Level[array[500,
             eventQueue: eventQueue, gameTopic: gameTopic, nextState: nextState,
             needsToTransition: false)
 
-proc newLevelList*(reg: Registry, g: Gamepad, levels: seq[ptr Level[array[500,
-        uint8]]]): Option[LevelState] =
+proc newLevelList*(reg: Registry, g: Gamepad, levels: seq[ref Level]): Option[LevelState] =
     if len(levels) == 0:
         return none(LevelState)
     let nextState = newLevelList(reg, g, levels[1..^1])
     return some(newLevelState(reg, g, levels[0], nextState))
 
-proc intToTileType(x: uint8): Option[WorldTileType] =
+proc intToTileType(x: int8): Option[WorldTileType] =
     case x:
         of 0: none(WorldTileType)
         of 1: some(wttTile)
@@ -62,7 +61,7 @@ proc intToTileType(x: uint8): Option[WorldTileType] =
         of 16: some(wttEnding)
         else: none(WorldTileType)
 
-proc intToSprite(x: uint8): Option[ptr Sprite] =
+proc intToSprite(x: int8): Option[ptr Sprite] =
     case x:
         of 0: none(ptr Sprite)
         of 1: some(unsafeAddr tileSprite)

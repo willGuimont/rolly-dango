@@ -462,6 +462,22 @@ function flattenWorld() {
   return output;
 }
 
+function exportCodec(codec) {
+  let output = '';
+
+  if (!Array.isArray(codec)) {
+    output += `newLeaf(${codec})`;
+    return output;
+  }
+
+  output += `newNode(`;
+  output += exportCodec(codec[0]);
+  output += ', ';
+  output += exportCodec(codec[1]);
+  output += ')'
+  return output;
+}
+
 function exportWorld() {
   let data = flattenWorld();
   let symbols = getTileSymbols();
@@ -481,30 +497,25 @@ function exportWorld() {
   }
 
   var output = "";
-  output += "import ../../components/worldtilecomponent<br/>"
-  output += "import ../../bintree/bintree<br/><br/>"
-  output += `const worldXSize: int8 = ${WORLD_SIZE}<br/>`
-  output += `const worldYSize: int8 = ${WORLD_SIZE}<br/>`
-  output += `const worldZSize: int8 = ${WORLD_HEIGHT}<br/>`
-  output += `let codec: BinaryTree[uint8] = newLeaf[uint8](1)  # TODO add codec here<br/>`
-  output += `const worldData: array[${compressedSize}, uint8] = [`
-
-  var firstTile = true;
+  output += "import ../../components/worldtilecomponent<br/>";
+  output += "import ../../bintree/bintree<br/><br/>";
+  output += `const worldXSize: int8 = ${WORLD_SIZE}<br/>`;
+  output += `const worldYSize: int8 = ${WORLD_SIZE}<br/>`;
+  output += `const worldZSize: int8 = ${WORLD_HEIGHT}<br/>`;
+  output += `let codec: BinaryTree = ${exportCodec(codec)}<br/>`;
+  output += `const worldData: array[${compressedSize}, int8] = [`;
 
   for (let i = 0; i < compressedSize; i++) {
-    output = output.concat(`0b${compressed.slice(i * 8, (i + 1) * 8)}`)
+    output = output.concat(`0b${compressed.slice(i * 8, (i + 1) * 8)}`);
+    output += "'i8";
 
-    if (firstTile) {
-      output += "'u8";
-      firstTile = false;
-    }
     let isLast = i === compressedSize - 1;
     if (!isLast) {
-      output += ", "
+      output += ", ";
     }
   }
-  output += "]<br/><br/>"
-  output += "let TODO_LEVEL_NAME = decompressLevel(worldData, codec)<br/><br/>"
+  output += "]<br/><br/>";
+  output += "let TODO_LEVEL_NAME* = decompressLevel(worldXSize, worldYSize, worldZsize, worldData, codec)<br/><br/>";
 
   select("#exported").html(output);
 }
