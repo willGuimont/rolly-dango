@@ -8,7 +8,7 @@ type
         flags*: uint8
         data*: ptr array[64, uint8]
     SpriteComponent* = ref object of Component
-        sprite*: Sprite
+        sprite*: ptr Sprite
 
 macro makeSprite*(data: untyped): untyped =
     let width = ident($data & "Width")

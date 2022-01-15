@@ -101,7 +101,7 @@ function drawSlope() {
 
 function drawPunch() {
   scale(0.3);
-  rotateZ(PI/2);
+  rotateZ(PI / 2);
   cone(40, 70);
 }
 
@@ -137,7 +137,7 @@ function drawTile(tile) {
     drawSlope();
   } else if (tile == TILE_MIRROR_BACK) {
     rotateX(PI / 2);
-    rotateY(-4*PI/2);
+    rotateY(-4 * PI / 2);
     drawSlope();
   } else if (tile == TILE_PUNCH_FRONT) {
     rotateX(3 * PI / 2);
@@ -145,11 +145,11 @@ function drawTile(tile) {
     drawPunch();
   } else if (tile == TILE_PUNCH_RIGHT) {
     rotateX(PI / 2);
-    rotateY(-2*PI/2);
+    rotateY(-2 * PI / 2);
     drawPunch();
   } else if (tile == TILE_PUNCH_LEFT) {
     rotateX(PI / 2);
-    rotateY(-4*PI/2);
+    rotateY(-4 * PI / 2);
     drawPunch();
   } else if (tile == TILE_PUNCH_BACK) {
     rotateX(PI / 2);
@@ -332,33 +332,190 @@ function draw() {
   showTileType();
 }
 
-function exportWorld() {
-  var output = "";
-  output += "import ../../components/worldtilecomponent<br/><br/>"
-  output += `const worldXSize: int = ${WORLD_SIZE}<br/>`
-  output += `const worldYSize: int = ${WORLD_SIZE}<br/>`
-  output += `const worldZSize: int = ${WORLD_HEIGHT}<br/>`
-  output += `const worldData: array[${WORLD_SIZE * WORLD_SIZE * WORLD_HEIGHT}, uint8] = [`
-
-  var firstTile = true;
+function getTileSymbols() {
+  let out = new Set();
 
   for (let z = 0; z < WORLD_HEIGHT; z++) {
     for (let x = 0; x < WORLD_SIZE; x++) {
       for (let y = 0; y < WORLD_SIZE; y++) {
-        output += world[x][y][z]
-        if (firstTile) {
-          output += "'u8";
-          firstTile = false;
-        }
-        let isLast = z == WORLD_HEIGHT - 1 && x == WORLD_SIZE - 1 && y == WORLD_SIZE - 1
-        if (!isLast) {
-          output += ", "
-        }
+        out.add(world[x][y][z]);
       }
     }
   }
-  output += "]<br/><br/>"
-  output += "makeLevel(TODO_INSERT_LEVEL_NAME)<br/><br/>"
+
+  return Array.from(out);
+}
+
+function getOccurences(symbols, data) {
+  let count = new Map();
+
+  for (let i = 0; i < data.length; i++) {
+    if (count.get(data[i]) == undefined) {
+      count.set(data[i], 1);
+    } else {
+      count.set(data[i], count.get(data[i]) + 1);
+    }
+  }
+
+  let out = [];
+
+  for (let i = 0; i < symbols.length; ++i) {
+    let s = symbols[i];
+    out.push(count.get(s));
+  }
+
+  return out;
+}
+
+function zip(xs, ys) {
+  return xs.map((x, i) => [x, ys[i]]);
+}
+
+function popNextNode(q1, q2) {
+  let x = [Infinity, Infinity];
+  let y = [Infinity, Infinity];
+
+  if (q1.length > 0) {
+    x = q1[0];
+  }
+  if (q2.length > 0) {
+    y = q2[0];
+  }
+
+  if (x[1] < y[1]) {
+    return [x, q1.slice(1), q2];
+  } else {
+    return [y, q1, q2.slice(1)];
+  }
+}
+
+function huffmanCode(symbols, probs) {
+  let nodes = zip(symbols, probs);
+  nodes.sort((a, b) => a[1] - b[1]);
+  let q1 = []
+  let q2 = []
+  for (let i = 0; i < nodes.length; ++i) {
+    q1.push(nodes[i]);
+  }
+
+  while (q1.length + q2.length > 1) {
+    let x, q1_prime, q2_prime, y, q1_prime_prime, q2_prime_prime
+    [x, q1_prime, q2_prime] = popNextNode(q1, q2);
+    [y, q1_prime_prime, q2_prime_prime] = popNextNode(q1_prime, q2_prime);
+    let n = [[x[0], y[0]], x[1] + y[1]]
+
+    q1 = q1_prime_prime;
+    q2 = q2_prime_prime;
+
+    q2.push(n);
+  }
+
+  let root = popNextNode(q1, q2)[0][0];
+  return root;
+}
+
+function compressSymbol(codec, symbol, compressed = '') {
+  if (symbol === codec) {
+    compressed += '0';
+    return compressed;
+  }
+
+  if (symbol === codec[0]) {
+    compressed = compressed.concat('0');
+    return compressed;
+  } else if (symbol === codec[1]) {
+    compressed = compressed.concat('1');
+    return compressed;
+  }
+
+  if (Array.isArray(codec[0])) {
+    let c = compressSymbol(codec[0], symbol, compressed);
+    if (c !== '') {
+      compressed = compressed.concat('0', c);
+      return compressed;
+    }
+  }
+
+  if (Array.isArray(codec[1])) {
+    let c = compressSymbol(codec[1], symbol, compressed);
+    if (c !== '') {
+      compressed = compressed.concat('1', c);
+      return compressed;
+    }
+  }
+  return '';
+}
+
+function compressData(codec, data) {
+  return data.map(x => compressSymbol(codec, x)).join('')
+}
+
+function flattenWorld() {
+  let output = [];
+  for (let z = 0; z < WORLD_HEIGHT; z++) {
+    for (let x = 0; x < WORLD_SIZE; x++) {
+      for (let y = 0; y < WORLD_SIZE; y++) {
+        output.push(world[x][y][z]);
+      }
+    }
+  }
+  return output;
+}
+
+function exportCodec(codec) {
+  let output = '';
+
+  if (!Array.isArray(codec)) {
+    output += `newLeaf(${codec})`;
+    return output;
+  }
+
+  output += `newNode(`;
+  output += exportCodec(codec[0]);
+  output += ', ';
+  output += exportCodec(codec[1]);
+  output += ')'
+  return output;
+}
+
+function exportWorld() {
+  let data = flattenWorld();
+  let symbols = getTileSymbols();
+  let occ = getOccurences(symbols, data);
+  let codec = huffmanCode(symbols, occ);
+
+  console.log('codec');
+  console.log(codec);
+
+  let compressed = compressData(codec, data);
+
+  let compressedSize = Math.ceil(compressed.length / 8.0);
+  let numPadding = 8 * compressedSize - compressed.length;
+
+  for (let i = 0; i < numPadding; ++i) {
+    compressed = compressed.concat('0');
+  }
+
+  var output = "";
+  output += "import ../../components/worldtilecomponent<br/>";
+  output += "import ../../bintree/bintree<br/><br/>";
+  output += `const worldXSize: int8 = ${WORLD_SIZE}<br/>`;
+  output += `const worldYSize: int8 = ${WORLD_SIZE}<br/>`;
+  output += `const worldZSize: int8 = ${WORLD_HEIGHT}<br/>`;
+  output += `let codec: BinaryTree = ${exportCodec(codec)}<br/>`;
+  output += `const worldData: array[${compressedSize}, int8] = [`;
+
+  for (let i = 0; i < compressedSize; i++) {
+    output = output.concat(`0b${compressed.slice(i * 8, (i + 1) * 8)}`);
+    output += "'i8";
+
+    let isLast = i === compressedSize - 1;
+    if (!isLast) {
+      output += ", ";
+    }
+  }
+  output += "]<br/><br/>";
+  output += "let TODO_LEVEL_NAME* = decompressLevel(worldXSize, worldYSize, worldZsize, worldData, codec)<br/><br/>";
 
   select("#exported").html(output);
 }
