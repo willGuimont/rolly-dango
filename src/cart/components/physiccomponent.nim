@@ -4,8 +4,6 @@ import ../ecs/ecs
 import positioncomponent
 import worldtilecomponent
 import observercomponent
-import playercomponent
-import ../wasm4
 
 type
     Direction* = enum
@@ -25,7 +23,7 @@ let PUNCH_VELOCITY_INCREASE: int8 = 3
 let observerEventQueue*: ObserverPunchEventQueue = ObserverPunchEventQueue()
 
 proc newPhysicsComponent*(velocity: Velocity): PhysicsComponent =
-    return PhysicsComponent(velocity: velocity, eventQueue: MovementEventQueue())
+    return PhysicsComponent(velocity: velocity, eventQueue: MovementEventQueue(), energy: 0)
 
 proc getTileAt(reg: Registry, x: int8, y: int8, z: int8): Option[Entity] =
     for e in reg.entitiesWith(PositionComponent, WorldTileComponent):
@@ -189,10 +187,6 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                     +pos.z-1).isNone():
                 pos.x += directionTuple.x
                 pos.y += directionTuple.y
-                let velDelta = getTileVelocity(reg.getComponent[:
-                            WorldTileComponent](entityUnder.get()))
-                phy.velocity.x += velDelta.x
-                phy.velocity.y += velDelta.y
 
         else:
             pos.x += directionTuple.x
@@ -210,9 +204,11 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                 if reg.getTileAt(pos.x, pos.y-1, pos.z+1).isNone():
                     pos.y.dec
                     pos.z.inc
+                    phy.velocity.y += 1
             else:
                 pos.y.dec
                 pos.z.inc
+                phy.velocity.y += 1
         elif forwardTileType == WorldTileType.wttSlopeFront and direction ==
                 Direction.dBack:
             let tileAbove = reg.getTileAt(pos.x-1, pos.y, pos.z+1)
@@ -223,9 +219,11 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                 if reg.getTileAt(pos.x-1, pos.y, pos.z+1).isNone():
                     pos.x.dec
                     pos.z.inc
+                    phy.velocity.x += 1
             else:
                 pos.x.dec
                 pos.z.inc
+                phy.velocity.x += 1
         elif forwardTileType == WorldTileType.wttSlopeLeft and direction ==
                 Direction.dRight:
             let tileAbove = reg.getTileAt(pos.x, pos.y+1, pos.z+1)
@@ -236,9 +234,11 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                 if reg.getTileAt(pos.x, pos.y+1, pos.z+1).isNone():
                     pos.y.inc
                     pos.z.inc
+                    phy.velocity.y -= 1
             else:
                 pos.y.inc
                 pos.z.inc
+                phy.velocity.y -= 1
         elif forwardTileType == WorldTileType.wttSlopeBack and direction ==
                 Direction.dFront:
             let tileAbove = reg.getTileAt(pos.x+1, pos.y, pos.z+1)
@@ -249,9 +249,11 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                 if reg.getTileAt(pos.x+1, pos.y, pos.z+1).isNone():
                     pos.x.inc
                     pos.z.inc
+                    phy.velocity.x -= 1
             else:
                 pos.x.inc
                 pos.z.inc
+                phy.velocity.x -= 1
         elif forwardTileType == WorldTileType.wttMirrorRight and (direction ==
                 Direction.dLeft or direction == Direction.dFront):
             let directionTuple = getDirectionTuple(direction)
@@ -402,12 +404,18 @@ proc physicsSystem*(reg: Registry) =
             processTileFriction(reg, pos, phy)
             processGravity(reg, pos)
 
+            if getAbsoluteVelocity(phy.velocity) == 0:
+                phy.energy = pos.z-1
             let entityUnder = reg.standingOn(pos)
             if entityUnder.isSome():
-                let entity = entityUnder.get()
-                if reg.hasComponent[:WorldTileComponent](entity):
+                let entityU = entityUnder.get()
+                if phy.energy != 0 and reg.hasComponent[:WorldTileComponent](
+                        entityU) and isSlope(reg.getComponent[:
+                                WorldTileComponent](
+                        entityU).tileType):
                     let velDelta = getTileVelocity(reg.getComponent[:
-                            WorldTileComponent](entity))
-                    phy.velocity.x += velDelta.x
-                    phy.velocity.y += velDelta.y
+                            WorldTileComponent](entityU))
+                    phy.velocity.x = velDelta.x * phy.energy
+                    phy.velocity.y = velDelta.y * phy.energy
+                    phy.energy = 0
 
