@@ -1,6 +1,5 @@
 import std/sugar
 import std/algorithm
-import std/options
 import cart/wasm4
 import cart/ecs/ecs
 import cart/components/spritecomponent
@@ -9,22 +8,34 @@ import cart/components/worldtilecomponent
 import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
-import cart/systems.observersystem
+import cart/systems/observersystem
+import cart/assets/levels/testlevel01
+import cart/assets/levels/testlevel02
+import cart/assets/levels/testlevel03
+import cart/assets/levels/testlevel04
+import cart/assets/levels/testlevel05
+import cart/assets/levels/testlevel06
+import cart/assets/levels/testlevel07
 import cart/assets/levels/testlevel08
-import cart/assets/levels/testlevel11
+import cart/assets/levels/testlevel09
+import cart/assets/levels/testlevel10
 import cart/input/gamepad
 import cart/state/gamestatemachine
+import cart/assets/sprites
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
 proc NimMain {.importc.}
 
+let initialDrawColor = DRAW_COLORS[]
+let spriteDrawColor: uint16 = 0x4320
+
 var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
-var decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
+const decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
-var origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
-var frameCount: int = 0
+const origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
+var frameCount: uint = 0
 var sm: StateMachine[LevelState]
 
 var isTitleScreen = true
@@ -56,7 +67,7 @@ proc render(reg: Registry) =
       else:
         result = -1
 
-  DRAW_COLORS[] = 0x4320
+  DRAW_COLORS[] = spriteDrawColor
   var sprites = reg.entitiesWith(SpriteComponent, PositionComponent)
   for entity in sprites.sorted(comparePositions):
     let (spriteComponent, positionComponent) = reg.getComponents(entity,
@@ -69,8 +80,11 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(reg, theGamepad, @[tlevel11, tlevel08])
-  sm = newStateMachine(level.get())
+  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr tlevel01,
+      unsafeAddr tlevel02, unsafeAddr tlevel03, unsafeAddr tlevel04,
+      unsafeAddr tlevel05, unsafeAddr tlevel06, unsafeAddr tlevel07,
+      unsafeAddr tlevel08, unsafeAddr tlevel09, unsafeAddr tlevel10])
+  sm = newStateMachine(level)
 
 proc setPalette() =
   PALETTE[0] = 0xf99dec
@@ -110,8 +124,20 @@ proc runGame() =
 
 proc update {.exportWasm.} =
   if isTitleScreen:
-    text("Rolly Dango", 0, 0)
-    if bool(GAMEPAD1[] and BUTTON_1):
+    DRAW_COLORS[] = spriteDrawColor
+    blit(addr dangoSprite.data[][0], 20, 6, 16, 16, BLIT_2BPP)
+    blit(addr dangoSprite.data[][0], 120, 6, 16, 16, BLIT_2BPP)
+    DRAW_COLORS[] = initialDrawColor
+    text("Rolly Dango", 35, 10)
+    text("Help the dango get", 0, 30)
+    text("to the exit", 0, 40)
+    text("Controls:", 0, 60)
+    text("- Arrows to move", 0, 70)
+    text("- X to restart level", 0, 80)
+
+    text("Press x to start", 15, 140)
+    theGamepad.updateGamepad()
+    if theGamepad.isButton1():
       isTitleScreen = false
       isInGame = true
   elif isInGame:
@@ -120,4 +146,15 @@ proc update {.exportWasm.} =
       isInGame = false
       isEndingScreen = true
   elif isEndingScreen:
-    text("Finished the game :)", 0, 0)
+    DRAW_COLORS[] = spriteDrawColor
+    blit(addr dangoSprite.data[][0], 20, 6, 16, 16, BLIT_2BPP)
+    blit(addr dangoSprite.data[][0], 120, 6, 16, 16, BLIT_2BPP)
+    DRAW_COLORS[] = initialDrawColor
+    text("Rolly Dango", 35, 10)
+    text("Finished the game", 10, 30)
+    text("Press x to restart", 7, 140)
+    theGamepad.updateGamepad()
+    if theGamepad.isButton1():
+      isTitleScreen = true
+      isInGame = false
+      isEndingScreen = false

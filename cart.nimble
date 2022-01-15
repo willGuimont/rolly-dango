@@ -35,6 +35,6 @@ task rel, "Build the cartridge with all optimizations":
 after rel:
   let exe = findExe("wasm-opt")
   if exe != "":
-    exec(&"wasm-opt -Oz --strip-producers {outFile} -o {outFile}")
+    exec(&"wasm-opt -Oz --converge --strip-producers --strip-debug --strip-dwarf --strip-target-features -all --zero-filled-memory --traps-never-happen --ignore-implicit-traps --const-hoisting {outFile} -o {outFile}")
   else:
     echo "Tip: wasm-opt was not found. Install it from binaryen for smaller builds!"
