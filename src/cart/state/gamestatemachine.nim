@@ -18,14 +18,14 @@ type
         needsToTransition: bool
         reg*: Registry
         gamepad: Gamepad
-        levelData*: ref Level
+        levelData*: ptr Level
         wasBuilt*: bool
         eventQueue: GameEventQueue
         gameTopic: Topic[GameMessage]
     StateMachine*[T] = object
         currentState: T
 
-proc newLevelState*(reg: Registry, g: Gamepad, level: ref Level,
+proc newLevelState*(reg: Registry, g: Gamepad, level: ptr Level,
         nextState: Option[LevelState]): LevelState =
     let eventQueue = newEventQueue[GameMessage]()
     var gameTopic = newTopic[GameMessage]()
@@ -34,7 +34,7 @@ proc newLevelState*(reg: Registry, g: Gamepad, level: ref Level,
             eventQueue: eventQueue, gameTopic: gameTopic, nextState: nextState,
             needsToTransition: false)
 
-proc newLevelList*(reg: Registry, g: Gamepad, levels: seq[ref Level]): Option[LevelState] =
+proc newLevelList*(reg: Registry, g: Gamepad, levels: seq[ptr Level]): Option[LevelState] =
     if len(levels) == 0:
         return none(LevelState)
     let nextState = newLevelList(reg, g, levels[1..^1])

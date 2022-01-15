@@ -15,7 +15,7 @@ type
     x*: int8
     y*: int8
     z*: int8
-    data*: ref seq[int8]
+    data*: ptr array[500, int8]
 
 macro makeLevel*(name: untyped): untyped =
   return quote do:
@@ -24,9 +24,10 @@ macro makeLevel*(name: untyped): untyped =
         z: worldZSize, data: unsafeAddr worldData)
 
 proc decompressLevel*(worldXSize, worldYSize, worldZsize: int8, data: openArray[
-    int8], codec: BinaryTree): ref Level =
-  var tiles = new(seq[int8])
+    int8], codec: BinaryTree): Level =
+  var tiles = create(array[500, int8])
   var currentNode = codec
+  var numTiles = 0
   for i in 0..<(data.len() * 8):
     let byteIdx = int(floor(i / 8))
     let bitIdx = int8(i mod 8)
@@ -38,10 +39,10 @@ proc decompressLevel*(worldXSize, worldYSize, worldZsize: int8, data: openArray[
       currentNode = currentNode.getRight()
 
     if currentNode.isLeaf():
-      tiles[].add(currentNode.getData())
+      tiles[numTiles] = currentNode.getData()
+      numTiles.inc
       currentNode = codec
 
-  result = new(Level)
   result.x = worldXSize
   result.y = worldYSize
   result.z = worldZsize
