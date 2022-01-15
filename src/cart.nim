@@ -62,10 +62,10 @@ proc render(reg: Registry) =
     if result == 0:
       result = cmp(p1.y, p2.y)
     if result == 0:
-      if reg.hasComponent[:WorldTileComponent](e1):
-        result = 1
-      else:
+      if reg.hasComponent[:PlayerComponent](e1):
         result = -1
+      else:
+        result = 1
 
   DRAW_COLORS[] = spriteDrawColor
   var sprites = reg.entitiesWith(SpriteComponent, PositionComponent)

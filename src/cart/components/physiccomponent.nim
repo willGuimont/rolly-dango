@@ -79,19 +79,6 @@ proc getDirection(vel: Velocity): Direction =
     if vel.x == 0 and vel.y == 0:
         return Direction.dNone
 
-proc getOppositeDirection(direction: Direction): Direction =
-    case direction:
-    of dRight:
-        return dLeft
-    of dFront:
-        return dBack
-    of dLeft:
-        return dRight
-    of dBack:
-        return dFront
-    else:
-        return dNone
-
 proc transfertVelocity(vel: Velocity, direction: Direction): Velocity =
     let value = vel.x + vel.y
     case direction
@@ -398,9 +385,6 @@ proc processObserver(reg: Registry) =
     while message.isSome():
         reg.processObserverMessage(message.get())
         message = observerEventQueue.popMessage()
-
-proc moved(pos: PositionComponent, x, y, z: int8): bool =
-    return not (pos.x == x and pos.y == y and pos.z == z)
 
 proc physicsSystem*(reg: Registry) =
     processObserver(reg)
