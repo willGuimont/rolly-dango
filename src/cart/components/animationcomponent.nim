@@ -1,10 +1,11 @@
 import std/macros
 import ../ecs/ecs
 import ../components/spritecomponent
+import ../components/physiccomponent
 
 type
     AnimationFrame* = ref object
-        frame*: Sprite
+        frame*: ptr Sprite
         shownFrame*: int
     Animation* = object
         frames*: seq[AnimationFrame]
@@ -20,13 +21,15 @@ macro makeAnimationFrame*(name: untyped, shownFrame: int): untyped =
     let spriteIdent = ident($name & "Sprite")
     let animIdent = ident($name & "AnimFrame")
     return quote do:
-        let `animIdent` = AnimationFrame(frame: `spriteIdent`,
+        let `animIdent` = AnimationFrame(frame: unsafeAddr `spriteIdent`,
                 shownFrame: `shownFrame`)
 
 proc animationSystem*(reg: Registry, t: int) =
-    for (sprite, anim) in reg.entitiesWithComponents(SpriteComponent,
-            AnimationComponent):
+    for (sprite, anim, phy) in reg.entitiesWithComponents(SpriteComponent,
+            AnimationComponent, PhysicsComponent):
         let elapsed = t - anim.lastUpdatedTime
+        if abs(phy.velocity.x) + abs(phy.velocity.y) > 0:
+            anim.frameIndex = 3
         let currentFrame = anim.animation.frames[anim.frameIndex]
         if elapsed > currentFrame.shownFrame:
             anim.frameIndex = (anim.frameIndex + 1) mod (

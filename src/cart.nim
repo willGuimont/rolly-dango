@@ -30,11 +30,10 @@ proc NimMain {.importc.}
 
 var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
-var frameCount: int = 0
 const decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
 const origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
-var frameCount: uint = 0
+var frameCount: int = 0
 var sm: StateMachine[LevelState]
 
 var isTitleScreen = true
