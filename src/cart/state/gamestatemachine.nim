@@ -16,8 +16,8 @@ type
     LevelState* = ref object
         nextState*: LevelState
         needsToTransition: bool
-        reg*: Registry
-        gamepad: Gamepad
+        reg*: ptr Registry
+        gamepad: ptr Gamepad
         levelData*: ptr Level
         wasBuilt*: bool
         eventQueue: GameEventQueue
@@ -25,7 +25,7 @@ type
     StateMachine*[T] = object
         currentState: T
 
-proc newLevelState*(reg: Registry, g: Gamepad, level: ptr Level,
+proc newLevelState*(reg: ptr Registry, g: ptr Gamepad, level: ptr Level,
         nextState: LevelState): LevelState =
     let eventQueue = newEventQueue[GameMessage]()
     var gameTopic = newTopic[GameMessage]()
@@ -34,7 +34,7 @@ proc newLevelState*(reg: Registry, g: Gamepad, level: ptr Level,
             eventQueue: eventQueue, gameTopic: gameTopic, nextState: nextState,
             needsToTransition: false)
 
-proc newLevelList*(reg: Registry, g: Gamepad, levels: seq[
+proc newLevelList*(reg: ptr Registry, g: ptr Gamepad, levels: seq[
         ptr Level]): LevelState =
     if len(levels) == 0:
         return nil
@@ -84,17 +84,17 @@ proc intToSprite(x: int8): Option[ptr Sprite] =
         else: none(ptr Sprite)
 
 proc createDangoAt(s: LevelState, i, j, k: int8) =
-    var dango = s.reg.newEntity()
+    var dango = s.reg[].newEntity()
     var inputTopic = newTopic[MovementMessage]()
     let phyComponent = newPhysicsComponent(Velocity(x: 0, y: 0))
     phyComponent.eventQueue.followTopic(inputTopic)
-    s.reg.addComponent(dango, SpriteComponent(sprite: unsafeAddr dangoSprite))
-    s.reg.addComponent(dango, PositionComponent(x: i, y: j, z: k))
-    s.reg.addComponent(dango, InputComponent(gamepad: s.gamepad,
+    s.reg[].addComponent(dango, SpriteComponent(sprite: unsafeAddr dangoSprite))
+    s.reg[].addComponent(dango, PositionComponent(x: i, y: j, z: k))
+    s.reg[].addComponent(dango, InputComponent(gamepad: s.gamepad,
         physicTopic: inputTopic, gameTopic: s.gameTopic))
-    s.reg.addComponent(dango, phyComponent)
-    s.reg.addComponent(dango, PlayerComponent(gameTopic: s.gameTopic))
-    s.reg.addComponent(dango, WorldTileComponent(tileType: wttTile))
+    s.reg[].addComponent(dango, phyComponent)
+    s.reg[].addComponent(dango, PlayerComponent(gameTopic: s.gameTopic))
+    s.reg[].addComponent(dango, WorldTileComponent(tileType: wttTile))
 
 proc addPunchObserver(reg: Registry, entity: Entity, punchType: ObserverType, i,
         j, k: int8) =
@@ -129,37 +129,37 @@ proc buildLevel*(s: LevelState) =
                 let oSprite = intToSprite(tileType)
                 if ott.isSome() and oSprite.isSome():
                     let tt = ott.get()
-                    var e = s.reg.newEntity()
-                    s.reg.addComponent(e, SpriteComponent(sprite: oSprite.get()))
-                    s.reg.addComponent(e, PositionComponent(x: int8(i), y: int8(
-                            j), z: int8(k)))
-                    s.reg.addComponent(e, PhysicsComponent())
+                    var e = s.reg[].newEntity()
+                    s.reg[].addComponent(e, SpriteComponent(sprite: oSprite.get()))
+                    s.reg[].addComponent(e, PositionComponent(x: int8(i),
+                            y: int8(j), z: int8(k)))
+                    s.reg[].addComponent(e, PhysicsComponent())
                     if tt == wttStarting:
                         s.createDangoAt(int8(i), int8(j), int8(k + 1))
-                        s.reg.addComponent(e, WorldTileComponent(
+                        s.reg[].addComponent(e, WorldTileComponent(
                                 tileType: wttTile))
                     elif tt == wttPunchRight:
-                        addPunchObserver(s.reg, e, otPunchRight, int8(i), int8(
-                                j), int8(k))
-                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
+                        addPunchObserver(s.reg[], e, otPunchRight, int8(i),
+                                int8(j), int8(k))
+                        s.reg[].addComponent(e, WorldTileComponent(tileType: tt))
                     elif tt == wttPunchFront:
-                        addPunchObserver(s.reg, e, otPunchFront, int8(i), int8(
-                                j), int8(k))
-                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
+                        addPunchObserver(s.reg[], e, otPunchFront, int8(i),
+                                int8(j), int8(k))
+                        s.reg[].addComponent(e, WorldTileComponent(tileType: tt))
                     elif tt == wttPunchLeft:
-                        addPunchObserver(s.reg, e, otPunchLeft, int8(i), int8(
+                        addPunchObserver(s.reg[], e, otPunchLeft, int8(i), int8(
                                 j), int8(k))
-                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
+                        s.reg[].addComponent(e, WorldTileComponent(tileType: tt))
                     elif tt == wttPunchBack:
-                        addPunchObserver(s.reg, e, otPunchBack, int8(i), int8(
+                        addPunchObserver(s.reg[], e, otPunchBack, int8(i), int8(
                                 j), int8(k))
-                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
+                        s.reg[].addComponent(e, WorldTileComponent(tileType: tt))
                     else:
-                        s.reg.addComponent(e, WorldTileComponent(tileType: tt))
+                        s.reg[].addComponent(e, WorldTileComponent(tileType: tt))
 
 proc execute*(s: LevelState) =
     if not s.wasBuilt:
-        s.reg.destroyAllEntity()
+        s.reg[].destroyAllEntity()
         s.buildLevel()
         s.wasBuilt = true
     let m = s.eventQueue.popMessage()

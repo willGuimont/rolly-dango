@@ -32,7 +32,7 @@ var reg: Registry
 const decal: tuple[x: int32, y: int32, z: int32] = (x: int32(7), y: int32(4),
     z: int32(6))
 const origin: tuple[x: int32, y: int32] = (x: int32(76), y: int32(40))
-var frameCount: int = 0
+var frameCount: uint = 0
 var sm: StateMachine[LevelState]
 
 var isTitleScreen = true
@@ -77,7 +77,7 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(reg, theGamepad, @[unsafeAddr tlevel01,
+  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr tlevel01,
       unsafeAddr tlevel02, unsafeAddr tlevel03, unsafeAddr tlevel04,
       unsafeAddr tlevel05, unsafeAddr tlevel06, unsafeAddr tlevel07,
       unsafeAddr tlevel08, unsafeAddr tlevel09, unsafeAddr tlevel10])
