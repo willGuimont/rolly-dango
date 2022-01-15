@@ -19,6 +19,7 @@ type
     PhysicsComponent* = ref object of Component
         velocity*: Velocity
         eventQueue*: MovementEventQueue
+        energy*: int8
 
 let PUNCH_VELOCITY_INCREASE: int8 = 3
 let observerEventQueue*: ObserverPunchEventQueue = ObserverPunchEventQueue()
@@ -188,6 +189,11 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                     +pos.z-1).isNone():
                 pos.x += directionTuple.x
                 pos.y += directionTuple.y
+                let velDelta = getTileVelocity(reg.getComponent[:
+                            WorldTileComponent](entityUnder.get()))
+                phy.velocity.x += velDelta.x
+                phy.velocity.y += velDelta.y
+
         else:
             pos.x += directionTuple.x
             pos.y += directionTuple.y
@@ -391,16 +397,13 @@ proc physicsSystem*(reg: Registry) =
     for entity in reg.entitiesWith(PositionComponent,
             PhysicsComponent):
         let (pos, phy) = reg.getComponents(entity, PositionComponent, PhysicsComponent)
-        let x = pos.x
-        let y = pos.y
-        let z = pos.z
         if pos.z > 0:
             processMovement(reg, entity, pos, phy)
             processTileFriction(reg, pos, phy)
             processGravity(reg, pos)
 
             let entityUnder = reg.standingOn(pos)
-            if entityUnder.isSome() and moved(pos, x, y, z):
+            if entityUnder.isSome():
                 let entity = entityUnder.get()
                 if reg.hasComponent[:WorldTileComponent](entity):
                     let velDelta = getTileVelocity(reg.getComponent[:
