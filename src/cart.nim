@@ -1,6 +1,5 @@
 import std/sugar
 import std/algorithm
-import std/options
 import cart/wasm4
 import cart/ecs/ecs
 import cart/components/spritecomponent
