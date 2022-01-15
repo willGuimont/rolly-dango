@@ -14,7 +14,7 @@ import levelstateevents
 
 type
     LevelState* = ref object
-        nextState*: Option[LevelState]
+        nextState*: LevelState
         needsToTransition: bool
         reg*: Registry
         gamepad: Gamepad
@@ -26,7 +26,7 @@ type
         currentState: T
 
 proc newLevelState*(reg: Registry, g: Gamepad, level: ptr Level,
-        nextState: Option[LevelState]): LevelState =
+        nextState: LevelState): LevelState =
     let eventQueue = newEventQueue[GameMessage]()
     var gameTopic = newTopic[GameMessage]()
     eventQueue.followTopic(gameTopic)
@@ -34,11 +34,12 @@ proc newLevelState*(reg: Registry, g: Gamepad, level: ptr Level,
             eventQueue: eventQueue, gameTopic: gameTopic, nextState: nextState,
             needsToTransition: false)
 
-proc newLevelList*(reg: Registry, g: Gamepad, levels: seq[ptr Level]): Option[LevelState] =
+proc newLevelList*(reg: Registry, g: Gamepad, levels: seq[
+        ptr Level]): LevelState =
     if len(levels) == 0:
-        return none(LevelState)
+        return nil
     let nextState = newLevelList(reg, g, levels[1..^1])
-    return some(newLevelState(reg, g, levels[0], nextState))
+    return newLevelState(reg, g, levels[0], nextState)
 
 proc intToTileType(x: int8): Option[WorldTileType] =
     case x:
@@ -176,9 +177,9 @@ proc execute*[T](sm: var StateMachine[T]) =
     sm.currentState.execute()
 
 proc transition*(sm: var StateMachine) =
-    if sm.currentState.needsToTransition and sm.currentState.nextState.isSome():
-        sm.currentState = sm.currentState.nextState.get()
+    if sm.currentState.needsToTransition and sm.currentState.nextState != nil:
+        sm.currentState = sm.currentState.nextState
 
 proc isFinished*(sm: StateMachine): bool =
     return sm.currentState.needsToTransition and
-            sm.currentState.nextState.isNone()
+            sm.currentState.nextState == nil

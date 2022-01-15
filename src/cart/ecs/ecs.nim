@@ -68,12 +68,15 @@ proc removeComponent*[T](reg: Registry, entity: Entity) =
 proc getComponent*[T](reg: Registry, entity: Entity): T =
   let componentHash = ($T).hash()
   if not reg.components.hasKey(componentHash):
-    raise newException(ValueError, "No component store for component of type " & $T)
+    # raise newException(ValueError, "No component store for component of type " & $T)
+    return nil
   if not entity in reg.validEntities:
-    raise newException(ValueError, "Entity " & $entity & " is not a valid entity")
+    # raise newException(ValueError, "Entity " & $entity & " is not a valid entity")
+    return nil
   if not reg.components[componentHash].hasKey(entity):
     let message = "Entity " & $entity & " has not component of type " & $T
-    raise newException(ValueError, message)
+    # raise newException(ValueError, message)
+    return nil
   return (T)reg.components[componentHash][entity]
 
 macro getComponents*(reg: Registry, entity: Entity, componentTypes: varargs[

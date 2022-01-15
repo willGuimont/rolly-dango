@@ -78,12 +78,10 @@ proc render(reg: Registry) =
 proc buildWorld() =
   reg = newRegistry()
   let level = newLevelList(reg, theGamepad, @[unsafeAddr tlevel01,
-      unsafeAddr tlevel02, unsafeAddr tlevel03,
-
-unsafeAddr tlevel04, unsafeAddr tlevel05, unsafeAddr tlevel06,
-          unsafeAddr tlevel07, unsafeAddr tlevel08, unsafeAddr tlevel09,
-          unsafeAddr tlevel10])
-  sm = newStateMachine(level.get())
+      unsafeAddr tlevel02, unsafeAddr tlevel03, unsafeAddr tlevel04,
+      unsafeAddr tlevel05, unsafeAddr tlevel06, unsafeAddr tlevel07,
+      unsafeAddr tlevel08, unsafeAddr tlevel09, unsafeAddr tlevel10])
+  sm = newStateMachine(level)
 
 proc setPalette() =
   PALETTE[0] = 0xf99dec
