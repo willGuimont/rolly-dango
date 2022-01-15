@@ -21,10 +21,14 @@ import cart/assets/levels/testlevel09
 import cart/assets/levels/testlevel10
 import cart/input/gamepad
 import cart/state/gamestatemachine
+import cart/assets/sprites
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
 proc NimMain {.importc.}
+
+let initialDrawColor = DRAW_COLORS[]
+let spriteDrawColor: uint16 = 0x4320
 
 var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
@@ -63,7 +67,7 @@ proc render(reg: Registry) =
       else:
         result = -1
 
-  DRAW_COLORS[] = 0x4320
+  DRAW_COLORS[] = spriteDrawColor
   var sprites = reg.entitiesWith(SpriteComponent, PositionComponent)
   for entity in sprites.sorted(comparePositions):
     let (spriteComponent, positionComponent) = reg.getComponents(entity,
@@ -120,8 +124,20 @@ proc runGame() =
 
 proc update {.exportWasm.} =
   if isTitleScreen:
-    text("Rolly Dango", 0, 0)
-    if bool(GAMEPAD1[] and BUTTON_1):
+    DRAW_COLORS[] = spriteDrawColor
+    blit(addr dangoSprite.data[][0], 20, 6, 16, 16, BLIT_2BPP)
+    blit(addr dangoSprite.data[][0], 120, 6, 16, 16, BLIT_2BPP)
+    DRAW_COLORS[] = initialDrawColor
+    text("Rolly Dango", 35, 10)
+    text("Help the dango get", 0, 30)
+    text("to the exit", 0, 40)
+    text("Controls:", 0, 60)
+    text("- Arrows to move", 0, 70)
+    text("- X to restart level", 0, 80)
+
+    text("Press x to start", 15, 140)
+    theGamepad.updateGamepad()
+    if theGamepad.isButton1():
       isTitleScreen = false
       isInGame = true
   elif isInGame:
@@ -130,4 +146,15 @@ proc update {.exportWasm.} =
       isInGame = false
       isEndingScreen = true
   elif isEndingScreen:
-    text("Finished the game :)", 0, 0)
+    DRAW_COLORS[] = spriteDrawColor
+    blit(addr dangoSprite.data[][0], 20, 6, 16, 16, BLIT_2BPP)
+    blit(addr dangoSprite.data[][0], 120, 6, 16, 16, BLIT_2BPP)
+    DRAW_COLORS[] = initialDrawColor
+    text("Rolly Dango", 35, 10)
+    text("Finished the game", 10, 30)
+    text("Press x to restart", 7, 140)
+    theGamepad.updateGamepad()
+    if theGamepad.isButton1():
+      isTitleScreen = true
+      isInGame = false
+      isEndingScreen = false
