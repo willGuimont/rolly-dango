@@ -4,6 +4,8 @@ import ../ecs/ecs
 import positioncomponent
 import worldtilecomponent
 import observercomponent
+import playercomponent
+import ../wasm4
 
 type
     Direction* = enum
@@ -69,6 +71,19 @@ proc getDirection(vel: Velocity): Direction =
     if vel.x == 0 and vel.y == 0:
         return Direction.dNone
 
+proc getOppositeDirection(direction: Direction): Direction =
+    case direction:
+    of dRight:
+        return dLeft
+    of dFront:
+        return dBack
+    of dLeft:
+        return dRight
+    of dBack:
+        return dFront
+    else:
+        return dNone
+
 proc transfertVelocity(vel: Velocity, direction: Direction): Velocity =
     let value = vel.x + vel.y
     case direction
@@ -110,6 +125,18 @@ proc getPunchBlockDirection(tileType: WorldTileComponent): Direction =
     of wttPunchLeft:
         return dLeft
     of wttPunchBack:
+        return dBack
+    else: return dNone
+
+proc getSlopeDirection(tileType: WorldTileComponent): Direction =
+    case tileType.tileType
+    of wttSlopeRight:
+        return dRight
+    of wttSlopeFront:
+        return dFront
+    of wttSlopeLeft:
+        return dLeft
+    of wttSlopeBack:
         return dBack
     else: return dNone
 
@@ -155,8 +182,8 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                 entityForward.get()).tileType == wttEnding:
         let entityUnder = reg.standingOn(pos)
         let directionTuple = getDirectionTuple(direction)
-        if entityUnder.isSome() and isSlope(reg.getComponent[:
-                WorldTileComponent](entityUnder.get()).tileType):
+        if entityUnder.isSome() and getSlopeDirection(reg.getComponent[:
+                WorldTileComponent](entityUnder.get())) == direction:
             if reg.getTileAt(pos.x+directionTuple.x, pos.y+directionTuple.y,
                     +pos.z-1).isNone():
                 pos.x += directionTuple.x
@@ -169,20 +196,56 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                 entityForward.get()).tileType
         if forwardTileType == WorldTileType.wttSlopeRight and direction ==
                 Direction.dLeft:
-            pos.y.dec
-            pos.z.inc
+            let tileAbove = reg.getTileAt(pos.x, pos.y-1, pos.z+1)
+            if tileAbove.isSome():
+                let (abovePos, abovePhy) = reg.getComponents(
+                        tileAbove.get(), PositionComponent, PhysicsComponent)
+                moveOneTile(reg, tileAbove.get(), abovePos, abovePhy, direction, tileMove-1)
+                if reg.getTileAt(pos.x, pos.y-1, pos.z+1).isNone():
+                    pos.y.dec
+                    pos.z.inc
+            else:
+                pos.y.dec
+                pos.z.inc
         elif forwardTileType == WorldTileType.wttSlopeFront and direction ==
                 Direction.dBack:
-            pos.x.dec
-            pos.z.inc
+            let tileAbove = reg.getTileAt(pos.x-1, pos.y, pos.z+1)
+            if tileAbove.isSome():
+                let (abovePos, abovePhy) = reg.getComponents(
+                        tileAbove.get(), PositionComponent, PhysicsComponent)
+                moveOneTile(reg, tileAbove.get(), abovePos, abovePhy, direction, tileMove-1)
+                if reg.getTileAt(pos.x-1, pos.y, pos.z+1).isNone():
+                    pos.x.dec
+                    pos.z.inc
+            else:
+                pos.x.dec
+                pos.z.inc
         elif forwardTileType == WorldTileType.wttSlopeLeft and direction ==
                 Direction.dRight:
-            pos.y.inc
-            pos.z.inc
+            let tileAbove = reg.getTileAt(pos.x, pos.y+1, pos.z+1)
+            if tileAbove.isSome():
+                let (abovePos, abovePhy) = reg.getComponents(
+                        tileAbove.get(), PositionComponent, PhysicsComponent)
+                moveOneTile(reg, tileAbove.get(), abovePos, abovePhy, direction, tileMove-1)
+                if reg.getTileAt(pos.x, pos.y+1, pos.z+1).isNone():
+                    pos.y.inc
+                    pos.z.inc
+            else:
+                pos.y.inc
+                pos.z.inc
         elif forwardTileType == WorldTileType.wttSlopeBack and direction ==
                 Direction.dFront:
-            pos.x.inc
-            pos.z.inc
+            let tileAbove = reg.getTileAt(pos.x+1, pos.y, pos.z+1)
+            if tileAbove.isSome():
+                let (abovePos, abovePhy) = reg.getComponents(
+                        tileAbove.get(), PositionComponent, PhysicsComponent)
+                moveOneTile(reg, tileAbove.get(), abovePos, abovePhy, direction, tileMove-1)
+                if reg.getTileAt(pos.x+1, pos.y, pos.z+1).isNone():
+                    pos.x.inc
+                    pos.z.inc
+            else:
+                pos.x.inc
+                pos.z.inc
         elif forwardTileType == WorldTileType.wttMirrorRight and (direction ==
                 Direction.dLeft or direction == Direction.dFront):
             let directionTuple = getDirectionTuple(direction)
@@ -320,17 +383,24 @@ proc processObserver(reg: Registry) =
         reg.processObserverMessage(message.get())
         message = observerEventQueue.popMessage()
 
+proc moved(pos: PositionComponent, x, y, z: int8): bool =
+    return not (pos.x == x and pos.y == y and pos.z == z)
+
 proc physicsSystem*(reg: Registry) =
     processObserver(reg)
     for entity in reg.entitiesWith(PositionComponent,
             PhysicsComponent):
         let (pos, phy) = reg.getComponents(entity, PositionComponent, PhysicsComponent)
+        let x = pos.x
+        let y = pos.y
+        let z = pos.z
         if pos.z > 0:
             processMovement(reg, entity, pos, phy)
             processTileFriction(reg, pos, phy)
             processGravity(reg, pos)
+
             let entityUnder = reg.standingOn(pos)
-            if entityUnder.isSome():
+            if entityUnder.isSome() and moved(pos, x, y, z):
                 let entity = entityUnder.get()
                 if reg.hasComponent[:WorldTileComponent](entity):
                     let velDelta = getTileVelocity(reg.getComponent[:
