@@ -7,7 +7,7 @@ const worldZSize: int8 = 5
 let codec: BinaryTree = newNode(newNode(newNode(newNode(newNode(newLeaf(16),
     newNode(newLeaf(15), newLeaf(7))), newNode(newNode(newLeaf(8), newLeaf(12)),
     newLeaf(3))), newLeaf(14)), newLeaf(1)), newLeaf(0))
-const worldData: array[82, int8] = [0b01010101'i8, 0b01010101'i8, 0b01010101'i8,
+const worldData: seq[int8] = @[0b01010101'i8, 0b01010101'i8, 0b01010101'i8,
     0b01010101'i8, 0b01010101'i8, 0b01010101'i8, 0b01010101'i8, 0b01001010'i8,
     0b10101010'i8, 0b10101010'i8, 0b01010101'i8, 0b00101010'i8, 0b10101001'i8,
     0b01010100'i8, 0b10101010'i8, 0b10100101'i8, 0b01010010'i8, 0b01001001'i8,
@@ -25,4 +25,4 @@ const worldData: array[82, int8] = [0b01010101'i8, 0b01010101'i8, 0b01010101'i8,
     0b11111111'i8, 0b11111111'i8, 0b11111111'i8, 0b11111111'i8, 0b11111111'i8,
     0b11111111'i8, 0b11111111'i8, 0b11111111'i8, 0b11100000'i8]
 
-let level03* = decompressLevel(worldXSize, worldYSize, worldZsize, worldData, codec)
+makeLevel(level03)
