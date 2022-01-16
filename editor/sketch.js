@@ -24,6 +24,7 @@ const TILE_PUNCH_BACK = 13;
 const TILE_ICE = 14;
 const TILE_STARTING = 15;
 const TILE_ENDING = 16;
+const TILE_STATIC = 17;
 
 var selectingTileTypeButtons = []
 var selectedTileType = TILE_CUBE;
@@ -63,7 +64,7 @@ function setup() {
 
   textFont(font);
 
-  for (let i = TILE_AIR; i <= TILE_ENDING; ++i) {
+  for (let i = TILE_AIR; i <= TILE_STATIC; ++i) {
     var button = createButton(tileToString(i));
     button.position(3 * width / 4, i * 25 + height / 4);
     button.mouseClicked(() => selectedTileType = i);
@@ -164,6 +165,9 @@ function drawTile(tile) {
   } else if (tile == TILE_ENDING) {
     fill(255, 0, 0);
     box(TILE_SIZE);
+  } else if (tile == TILE_STATIC) {
+    fill(127, 127, 127);
+    box(TILE_SIZE);
   } else {
     console.log("invalid tile type: " + tile)
   }
@@ -210,6 +214,8 @@ function tileToString(tile) {
     asString = "TILE_STARTING"
   else if (tile == TILE_ENDING)
     asString = "TILE_ENDING"
+  else if (tile == TILE_STATIC)
+    asString = "TILE_STATIC"
   else
     console.log("asString invalid tileType: " + tile);
   return asString;
