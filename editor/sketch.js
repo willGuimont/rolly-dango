@@ -503,7 +503,7 @@ function exportWorld() {
   output += `const worldYSize: int8 = ${WORLD_SIZE}<br/>`;
   output += `const worldZSize: int8 = ${WORLD_HEIGHT}<br/>`;
   output += `let codec: BinaryTree = ${exportCodec(codec)}<br/>`;
-  output += `const worldData: array[${compressedSize}, int8] = [`;
+  output += `const worldData: seq[int8] = @[`;
 
   for (let i = 0; i < compressedSize; i++) {
     output = output.concat(`0b${compressed.slice(i * 8, (i + 1) * 8)}`);

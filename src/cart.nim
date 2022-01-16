@@ -9,22 +9,22 @@ import cart/components/physiccomponent
 import cart/components/inputcomponent
 import cart/components/playercomponent
 import cart/systems/observersystem
-import cart/assets/levels/testlevel01
-import cart/assets/levels/testlevel02
-import cart/assets/levels/testlevel03
-import cart/assets/levels/testlevel04
-import cart/assets/levels/testlevel05
-import cart/assets/levels/testlevel06
-import cart/assets/levels/testlevel07
-import cart/assets/levels/testlevel08
-import cart/assets/levels/testlevel09
-import cart/assets/levels/testlevel10
+import cart/assets/levels/rlevel01
+import cart/assets/levels/rlevel02
+import cart/assets/levels/rlevel03
+import cart/assets/levels/rlevel04
+import cart/assets/levels/rlevel05
+import cart/assets/levels/rlevel06
 import cart/input/gamepad
 import cart/state/gamestatemachine
+import cart/assets/sprites
 
 # Call NimMain so that global Nim code in modules will be called,
 # preventing unexpected errors
 proc NimMain {.importc.}
+
+let initialDrawColor = 4611'u16
+let spriteDrawColor: uint16 = 0x4320
 
 var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
 var reg: Registry
@@ -59,11 +59,14 @@ proc render(reg: Registry) =
       result = cmp(p1.y, p2.y)
     if result == 0:
       if reg.hasComponent[:WorldTileComponent](e1):
-        result = 1
+        let tt = reg.getComponent[:WorldTileComponent](e1).tileType
+        if tt == wttMirrorBack or tt == wttMirrorFront or tt ==
+            wttMirrorLeft or tt == wttMirrorRight:
+          result = 1
       else:
         result = -1
 
-  DRAW_COLORS[] = 0x4320
+  DRAW_COLORS[] = spriteDrawColor
   var sprites = reg.entitiesWith(SpriteComponent, PositionComponent)
   for entity in sprites.sorted(comparePositions):
     let (spriteComponent, positionComponent) = reg.getComponents(entity,
@@ -73,13 +76,14 @@ proc render(reg: Registry) =
         position.x, position.y,
         spriteComponent.sprite.width,
         spriteComponent.sprite.height, spriteComponent.sprite.flags)
+  DRAW_COLORS[] = initialDrawColor
+  text("Press x to restart", 7, 140)
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr tlevel01,
-      unsafeAddr tlevel02, unsafeAddr tlevel03, unsafeAddr tlevel04,
-      unsafeAddr tlevel05, unsafeAddr tlevel06, unsafeAddr tlevel07,
-      unsafeAddr tlevel08, unsafeAddr tlevel09, unsafeAddr tlevel10])
+  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level01,
+      unsafeAddr level02, unsafeAddr level03, unsafeAddr level04,
+      unsafeAddr level05, unsafeAddr level06])
   sm = newStateMachine(level)
 
 proc setPalette() =
@@ -120,8 +124,21 @@ proc runGame() =
 
 proc update {.exportWasm.} =
   if isTitleScreen:
-    text("Rolly Dango", 0, 0)
-    if bool(GAMEPAD1[] and BUTTON_1):
+    DRAW_COLORS[] = initialDrawColor
+    text("Rolly Dango", 35, 10)
+    text("Help the dango get", 0, 30)
+    text("to the exit", 0, 40)
+    text("Controls:", 0, 60)
+    text("- Arrows to move", 0, 70)
+    text("- X to restart level", 0, 80)
+
+    text("Press x to start", 15, 140)
+
+    DRAW_COLORS[] = spriteDrawColor
+    blit(addr dangoSprite.data[][0], 20, 6, 16, 16, BLIT_2BPP)
+    blit(addr dangoSprite.data[][0], 120, 6, 16, 16, BLIT_2BPP)
+    theGamepad.updateGamepad()
+    if theGamepad.isButton1():
       isTitleScreen = false
       isInGame = true
   elif isInGame:
@@ -130,4 +147,9 @@ proc update {.exportWasm.} =
       isInGame = false
       isEndingScreen = true
   elif isEndingScreen:
-    text("Finished the game :)", 0, 0)
+    DRAW_COLORS[] = spriteDrawColor
+    blit(addr dangoSprite.data[][0], 20, 6, 16, 16, BLIT_2BPP)
+    blit(addr dangoSprite.data[][0], 120, 6, 16, 16, BLIT_2BPP)
+    DRAW_COLORS[] = initialDrawColor
+    text("Rolly Dango", 35, 10)
+    text("Finished the game", 10, 30)

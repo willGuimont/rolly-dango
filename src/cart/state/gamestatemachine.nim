@@ -116,15 +116,15 @@ proc addPunchObserver(reg: Registry, entity: Entity, punchType: ObserverType, i,
     reg.addComponent(entity, observerComponent)
 
 proc buildLevel*(s: LevelState) =
-    let level = s.levelData
-    let x = level.x
-    let y = level.y
-    let z = level.z
+    let level = decompressLevel(s.levelData)
+    let x = s.levelData.x
+    let y = s.levelData.y
+    let z = s.levelData.z
     for i in 0..<x:
         for j in 0..<y:
             for k in 0..<z:
                 let idx = i + j * x + k * x * y
-                let tileType = level.data[idx]
+                let tileType = level[idx]
                 let ott = intToTileType(tileType)
                 let oSprite = intToSprite(tileType)
                 if ott.isSome() and oSprite.isSome():
@@ -133,7 +133,8 @@ proc buildLevel*(s: LevelState) =
                     s.reg[].addComponent(e, SpriteComponent(sprite: oSprite.get()))
                     s.reg[].addComponent(e, PositionComponent(x: int8(i),
                             y: int8(j), z: int8(k)))
-                    s.reg[].addComponent(e, PhysicsComponent())
+                    if k > 0:
+                        s.reg[].addComponent(e, PhysicsComponent())
                     if tt == wttStarting:
                         s.createDangoAt(int8(i), int8(j), int8(k + 1))
                         s.reg[].addComponent(e, WorldTileComponent(
