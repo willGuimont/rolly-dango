@@ -156,7 +156,7 @@ proc isSlope(tileType: WorldTileType): bool =
 proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent, direction: Direction, tileMove: int8) =
     let entityHere = reg.getMirrorAt(pos.x, pos.y, pos.z)
-    if entityHere.isSome():
+    if entityHere.isSome() and entityHere.get() != entity:
         let hereTileType = reg.getComponent[:WorldTileComponent](
                 entityHere.get()).tileType
         if hereTileType == wttMirrorRight and (direction ==
@@ -304,11 +304,10 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                 position.y = pos.y + directionTuple.y
                 position.z = pos.z
 
-proc processMirror(reg: Registry, pos: PositionComponent,
+proc processMirror(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent) =
     let entityHere = reg.getMirrorAt(pos.x, pos.y, pos.z)
-    if entityHere.isSome():
-
+    if entityHere.isSome() and entityHere.get() != entity:
         case reg.getComponent[:WorldTileComponent](
                 entityHere.get()).tileType
         of wttMirrorRight, wttMirrorLeft:
@@ -324,7 +323,7 @@ proc processMirror(reg: Registry, pos: PositionComponent,
 
 proc processVelocityMovement(reg: Registry, entity: Entity,
         pos: PositionComponent, phy: PhysicsComponent) =
-    processMirror(reg, pos, phy)
+    processMirror(reg, entity, pos, phy)
     let direction = getDirection(phy.velocity)
     moveOneTile(reg, entity, pos, phy, direction, getAbsoluteVelocity(phy.velocity))
 
