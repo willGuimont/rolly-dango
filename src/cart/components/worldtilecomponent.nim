@@ -20,7 +20,6 @@ type
 
 macro makeLevel*(name: untyped): untyped =
   return quote do:
-    const worldSize = int(worldXSize) * int(worldYSize) * int(worldZSize)
     let `name`* = Level(x: worldXSize, y: worldYSize,
         z: worldZSize, data: unsafeAddr worldData, codec: unsafeAddr codec)
 
