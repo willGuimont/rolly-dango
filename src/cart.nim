@@ -56,8 +56,9 @@ proc render(reg: Registry) =
       result = cmp(p1.y, p2.y)
     if result == 0:
       if reg.hasComponent[:WorldTileComponent](e1):
-        let tt = reg.getComponent[WorldTileComponent].tileType
-        if tt ==  == wttMirrorBack or tt == wttMirrorFront or tt == wttMirrorLeft or tt == wttSlopeRight:
+        let tt = reg.getComponent[:WorldTileComponent](e1).tileType
+        if tt == wttMirrorBack or tt == wttMirrorFront or tt ==
+            wttMirrorLeft or tt == wttSlopeRight:
           result = -1
       else:
         result = 1
@@ -72,8 +73,8 @@ proc render(reg: Registry) =
         position.x, position.y,
         spriteComponent.sprite.width,
         spriteComponent.sprite.height, spriteComponent.sprite.flags)
-    DRAW_COLORS[] = initialDrawColor
-    text("Press x to restart", 7, 140)
+  DRAW_COLORS[] = initialDrawColor
+  text("Press x to restart", 7, 140)
 
 proc buildWorld() =
   reg = newRegistry()
@@ -119,9 +120,6 @@ proc runGame() =
 
 proc update {.exportWasm.} =
   if isTitleScreen:
-    DRAW_COLORS[] = spriteDrawColor
-    blit(addr dangoSprite.data[][0], 20, 6, 16, 16, BLIT_2BPP)
-    blit(addr dangoSprite.data[][0], 120, 6, 16, 16, BLIT_2BPP)
     DRAW_COLORS[] = initialDrawColor
     text("Rolly Dango", 35, 10)
     text("Help the dango get", 0, 30)
@@ -131,6 +129,10 @@ proc update {.exportWasm.} =
     text("- X to restart level", 0, 80)
 
     text("Press x to start", 15, 140)
+
+    DRAW_COLORS[] = spriteDrawColor
+    blit(addr dangoSprite.data[][0], 20, 6, 16, 16, BLIT_2BPP)
+    blit(addr dangoSprite.data[][0], 120, 6, 16, 16, BLIT_2BPP)
     theGamepad.updateGamepad()
     if theGamepad.isButton1():
       isTitleScreen = false
