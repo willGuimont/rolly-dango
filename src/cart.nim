@@ -62,8 +62,10 @@ proc render(reg: Registry) =
     if result == 0:
       result = cmp(p1.y, p2.y)
     if result == 0:
-      if reg.hasComponent[:PlayerComponent](e1):
-        result = -1
+      if reg.hasComponent[:WorldTileComponent](e1):
+        let tt = reg.getComponent[WorldTileComponent].tileType
+        if tt ==  == wttMirrorBack or tt == wttMirrorFront or tt == wttMirrorLeft or tt == wttSlopeRight:
+          result = -1
       else:
         result = 1
 
@@ -77,6 +79,8 @@ proc render(reg: Registry) =
         position.x, position.y,
         spriteComponent.sprite.width,
         spriteComponent.sprite.height, spriteComponent.sprite.flags)
+    DRAW_COLORS[] = initialDrawColor
+    text("Press x to restart", 7, 140)
 
 proc buildWorld() =
   reg = newRegistry()
