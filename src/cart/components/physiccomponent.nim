@@ -138,8 +138,8 @@ proc processTileFriction(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
     let entityUnder = reg.standingOn(pos)
     if entityUnder.isSome():
-        if reg.getComponent[:WorldTileComponent](entityUnder.get()).tileType ==
-                WorldTileType.wttTile:
+        let tt = reg.getComponent[:WorldTileComponent](entityUnder.get()).tileType
+        if tt == WorldTileType.wttTile or tt == wttStatic:
             let vel = tileFriction(phy)
             phy.velocity.x += vel.x
             phy.velocity.y += vel.y
