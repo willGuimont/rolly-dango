@@ -200,10 +200,12 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                     pos.y.dec
                     pos.z.inc
                     phy.velocity.y += 1
+                    phy.energy += 1
             else:
                 pos.y.dec
                 pos.z.inc
                 phy.velocity.y += 1
+                phy.energy += 1
         elif forwardTileType == WorldTileType.wttSlopeFront and direction ==
                 Direction.dBack:
             let tileAbove = reg.getTileAt(pos.x-1, pos.y, pos.z+1)
@@ -215,10 +217,12 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                     pos.x.dec
                     pos.z.inc
                     phy.velocity.x += 1
+                    phy.energy += 1
             else:
                 pos.x.dec
                 pos.z.inc
                 phy.velocity.x += 1
+                phy.energy += 1
         elif forwardTileType == WorldTileType.wttSlopeLeft and direction ==
                 Direction.dRight:
             let tileAbove = reg.getTileAt(pos.x, pos.y+1, pos.z+1)
@@ -230,10 +234,12 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                     pos.y.inc
                     pos.z.inc
                     phy.velocity.y -= 1
+                    phy.energy += 1
             else:
                 pos.y.inc
                 pos.z.inc
                 phy.velocity.y -= 1
+                phy.energy += 1
         elif forwardTileType == WorldTileType.wttSlopeBack and direction ==
                 Direction.dFront:
             let tileAbove = reg.getTileAt(pos.x+1, pos.y, pos.z+1)
@@ -245,10 +251,12 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
                     pos.x.inc
                     pos.z.inc
                     phy.velocity.x -= 1
+                    phy.energy += 1
             else:
                 pos.x.inc
                 pos.z.inc
                 phy.velocity.x -= 1
+                phy.energy += 1
         elif forwardTileType == WorldTileType.wttMirrorRight and (direction ==
                 Direction.dLeft or direction == Direction.dFront):
             let directionTuple = getDirectionTuple(direction)
@@ -401,12 +409,13 @@ proc physicsSystem*(reg: Registry) =
         let entityUnder = reg.standingOn(pos)
         if entityUnder.isSome():
             let entityU = entityUnder.get()
-            if phy.energy != 0 and getAbsoluteVelocity(phy.velocity) == 0 and
-                    reg.hasComponent[:WorldTileComponent](entityU) and isSlope(
-                            reg.getComponent[:WorldTileComponent](
-                    entityU).tileType):
+            let direction = getDirection(phy.velocity)
+            let slopeDirection = getSlopeDirection(reg.getComponent[:
+                    WorldTileComponent](entityU))
+            if phy.energy != 0 and slopeDirection != dNone and (direction ==
+                    dNone or direction == slopeDirection):
                 let velDelta = getTileVelocity(reg.getComponent[:
                         WorldTileComponent](entityU))
-                phy.velocity.x = velDelta.x * phy.energy
-                phy.velocity.y = velDelta.y * phy.energy
+                phy.velocity.x += velDelta.x * phy.energy
+                phy.velocity.y += velDelta.y * phy.energy
                 phy.energy = 0

@@ -10,7 +10,7 @@ The development phases are detailed in [the milestones page](https://github.com/
 
 ## Dependencies
 
-For Nim, we found that we needed to add functions to the [WASM-4](https://wasm4.org/docs/getting-started/setup) runtime (`wasi_snapshot_preview1.proc_exit`), so to build this game, you`ll need to install [willGuimont/wasm4](https://github.com/willGuimont/wasm4).
+For Nim, we found that we needed to add functions to the [WASM-4](https://wasm4.org/docs/getting-started/setup) runtime (`wasi_snapshot_preview1.proc_exit`), so to build this game, you`ll need to install [willGuimont/wasm4](https://github.com/willGuimont/wasm4). Otherwise, we'd get `Uncaught (in promise) TypeError: import object field 'wasi_snapshot_preview1' is not an Object` errors while running the game.
 
 To install it, run the following commands:
 
