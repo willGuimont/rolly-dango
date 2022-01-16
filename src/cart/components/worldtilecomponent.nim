@@ -8,7 +8,7 @@ type
     wttTile, wttSlopeLeft, wttSlopeRight, wttSlopeFront, wttSlopeBack,
         wttMirrorRight, wttMirrorFront, wttMirrorLeft, wttMirrorBack,
             wttStarting, wttEnding, wttIce, wttPunchFront, wttPunchRight,
-                wttPunchLeft, wttPunchBack
+                wttPunchLeft, wttPunchBack, wttStatic
   WorldTileComponent* = ref object of Component
     tileType*: WorldTileType
   Level* = object

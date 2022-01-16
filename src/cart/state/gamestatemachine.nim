@@ -60,6 +60,7 @@ proc intToTileType(x: int8): Option[WorldTileType] =
         of 14: some(wttIce)
         of 15: some(wttStarting)
         of 16: some(wttEnding)
+        of 17: some(wttStatic)
         else: none(WorldTileType)
 
 proc intToSprite(x: int8): Option[ptr Sprite] =
@@ -81,6 +82,7 @@ proc intToSprite(x: int8): Option[ptr Sprite] =
         of 14: some(unsafeAddr iceSprite)
         of 15: some(unsafeAddr tileSprite)
         of 16: some(unsafeAddr cupSprite)
+        of 17: some(unsafeAddr tileSprite)
         else: none(ptr Sprite)
 
 proc createDangoAt(s: LevelState, i, j, k: int8) =
@@ -133,7 +135,7 @@ proc buildLevel*(s: LevelState) =
                     s.reg[].addComponent(e, SpriteComponent(sprite: oSprite.get()))
                     s.reg[].addComponent(e, PositionComponent(x: int8(i),
                             y: int8(j), z: int8(k)))
-                    if k > 0:
+                    if k > 0 and tt != wttStatic:
                         s.reg[].addComponent(e, PhysicsComponent())
                     if tt == wttStarting:
                         s.createDangoAt(int8(i), int8(j), int8(k + 1))
