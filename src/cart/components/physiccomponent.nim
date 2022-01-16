@@ -401,9 +401,9 @@ proc physicsSystem*(reg: Registry) =
         let entityUnder = reg.standingOn(pos)
         if entityUnder.isSome():
             let entityU = entityUnder.get()
-            if phy.energy != 0 and reg.hasComponent[:WorldTileComponent](
-                    entityU) and isSlope(reg.getComponent[:
-                            WorldTileComponent](
+            if phy.energy != 0 and getAbsoluteVelocity(phy.velocity) == 0 and
+                    reg.hasComponent[:WorldTileComponent](entityU) and isSlope(
+                            reg.getComponent[:WorldTileComponent](
                     entityU).tileType):
                 let velDelta = getTileVelocity(reg.getComponent[:
                         WorldTileComponent](entityU))
