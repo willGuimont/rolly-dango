@@ -20,7 +20,7 @@ import cart/assets/sprites
 # preventing unexpected errors
 proc NimMain {.importc.}
 
-let initialDrawColor = DRAW_COLORS[]
+let initialDrawColor = 4611'u16
 let spriteDrawColor: uint16 = 0x4320
 
 var theGamepad: Gamepad = getNewGamepad(GAMEPAD1[])
@@ -58,10 +58,10 @@ proc render(reg: Registry) =
       if reg.hasComponent[:WorldTileComponent](e1):
         let tt = reg.getComponent[:WorldTileComponent](e1).tileType
         if tt == wttMirrorBack or tt == wttMirrorFront or tt ==
-            wttMirrorLeft or tt == wttSlopeRight:
+            wttMirrorLeft or tt == wttMirrorRight:
           result = 1
       else:
-        result = 1
+        result = -1
 
   DRAW_COLORS[] = spriteDrawColor
   var sprites = reg.entitiesWith(SpriteComponent, PositionComponent)
@@ -78,8 +78,7 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level01,
-      unsafeAddr level02, unsafeAddr level03])
+  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level03])
   sm = newStateMachine(level)
 
 proc setPalette() =
@@ -149,9 +148,3 @@ proc update {.exportWasm.} =
     DRAW_COLORS[] = initialDrawColor
     text("Rolly Dango", 35, 10)
     text("Finished the game", 10, 30)
-    text("Press x to restart", 7, 140)
-    theGamepad.updateGamepad()
-    if theGamepad.isButton1():
-      isTitleScreen = true
-      isInGame = false
-      isEndingScreen = false
