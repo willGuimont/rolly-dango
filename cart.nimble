@@ -2,7 +2,7 @@ import std/[os, strformat]
 
 # Package
 version = "0.1.0"
-author = "William Guimont-Martin (willGuimont) and Samuel Rouleau (samX500)"
+author = "willGuimont and samX500"
 description = "Rolly Dango, an isometric rolling puzzle made with [WASM-4]"
 license = "MIT"
 srcDir = "src"
