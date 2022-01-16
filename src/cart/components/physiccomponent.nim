@@ -322,8 +322,8 @@ proc processVelocityMovement(reg: Registry, entity: Entity,
     moveOneTile(reg, entity, pos, phy, direction, getAbsoluteVelocity(phy.velocity))
 
 proc playMoveSound() =
-    tone(120 or (200 shl 16), (0 shl 24) or (5 shl 16) or (5 shl 0) or (
-            5 shl 8), 100, TONE_PULSE1)
+    tone(320 or (540 shl 16), (0 shl 24) or (12 shl 16) or (0 shl 0) or (
+            0 shl 8), 100, TONE_PULSE1)
 
 proc processEventQueue(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent) =
