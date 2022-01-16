@@ -59,7 +59,7 @@ proc render(reg: Registry) =
         let tt = reg.getComponent[:WorldTileComponent](e1).tileType
         if tt == wttMirrorBack or tt == wttMirrorFront or tt ==
             wttMirrorLeft or tt == wttSlopeRight:
-          result = -1
+          result = 1
       else:
         result = 1
 

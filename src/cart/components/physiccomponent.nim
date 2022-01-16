@@ -391,15 +391,22 @@ proc physicsSystem*(reg: Registry) =
     for entity in reg.entitiesWith(PositionComponent,
             PhysicsComponent):
         let (pos, phy) = reg.getComponents(entity, PositionComponent, PhysicsComponent)
-        processMovement(reg, entity, pos, phy)
-        processTileFriction(reg, pos, phy)
-        processGravity(reg, pos)
-        let entityUnder = reg.standingOn(pos)
-        if entityUnder.isSome():
-            let entity = entityUnder.get()
-            if reg.hasComponent[:WorldTileComponent](entity):
-                let velDelta = getTileVelocity(reg.getComponent[:
-                        WorldTileComponent](entity))
-                phy.velocity.x += velDelta.x
-                phy.velocity.y += velDelta.y
+        if pos.z > 0:
+            processMovement(reg, entity, pos, phy)
+            processTileFriction(reg, pos, phy)
+            processGravity(reg, pos)
 
+            if getAbsoluteVelocity(phy.velocity) == 0:
+                phy.energy = pos.z-1
+            let entityUnder = reg.standingOn(pos)
+            if entityUnder.isSome():
+                let entityU = entityUnder.get()
+                if phy.energy != 0 and reg.hasComponent[:WorldTileComponent](
+                        entityU) and isSlope(reg.getComponent[:
+                                WorldTileComponent](
+                        entityU).tileType):
+                    let velDelta = getTileVelocity(reg.getComponent[:
+                            WorldTileComponent](entityU))
+                    phy.velocity.x = velDelta.x * phy.energy
+                    phy.velocity.y = velDelta.y * phy.energy
+                    phy.energy = 0
