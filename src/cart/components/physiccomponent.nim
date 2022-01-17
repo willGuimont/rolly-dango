@@ -138,8 +138,8 @@ proc processTileFriction(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
     let entityUnder = reg.standingOn(pos)
     if entityUnder.isSome():
-        let tt = reg.getComponent[:WorldTileComponent](entityUnder.get()).tileType
-        if tt == WorldTileType.wttTile or tt == wttStatic:
+        if reg.getComponent[:WorldTileComponent](entityUnder.get()).tileType ==
+                WorldTileType.wttTile:
             let vel = tileFriction(phy)
             phy.velocity.x += vel.x
             phy.velocity.y += vel.y
@@ -298,11 +298,10 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
         let (pos, obs, worldTileComponent) = reg.getComponents(entity,
                 PositionComponent, ObserverComponent, WorldTileComponent)
         for position in obs.positionObserving:
-            if direction == dNone:
-                let directionTuple = getDirectionTuple(getPunchBlockDirection(worldTileComponent))
-                position.x = pos.x + directionTuple.x
-                position.y = pos.y + directionTuple.y
-                position.z = pos.z
+            let directionTuple = getDirectionTuple(getPunchBlockDirection(worldTileComponent))
+            position.x = pos.x + directionTuple.x
+            position.y = pos.y + directionTuple.y
+            position.z = pos.z
 
 proc processMirror(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent) =
