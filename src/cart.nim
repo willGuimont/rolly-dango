@@ -81,7 +81,7 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level06,
+  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level01,
       unsafeAddr level02, unsafeAddr level03, unsafeAddr level04,
       unsafeAddr level05, unsafeAddr level06])
   sm = newStateMachine(level)
