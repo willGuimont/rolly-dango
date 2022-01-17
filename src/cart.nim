@@ -15,6 +15,7 @@ import cart/assets/levels/rlevel03
 import cart/assets/levels/rlevel04
 import cart/assets/levels/rlevel05
 import cart/assets/levels/rlevel06
+import cart/assets/levels/rlevel08
 import cart/input/gamepad
 import cart/state/gamestatemachine
 import cart/assets/sprites
@@ -83,7 +84,7 @@ proc buildWorld() =
   reg = newRegistry()
   let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level01,
       unsafeAddr level02, unsafeAddr level03, unsafeAddr level04,
-      unsafeAddr level05, unsafeAddr level06])
+      unsafeAddr level05, unsafeAddr level06, unsafeAddr level08])
   sm = newStateMachine(level)
 
 proc setPalette() =
