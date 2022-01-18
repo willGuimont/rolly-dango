@@ -15,6 +15,7 @@ import cart/assets/levels/rlevel03
 import cart/assets/levels/rlevel04
 import cart/assets/levels/rlevel05
 import cart/assets/levels/rlevel06
+import cart/assets/levels/rlevel07
 import cart/assets/levels/rlevel08
 import cart/input/gamepad
 import cart/state/gamestatemachine
@@ -59,13 +60,21 @@ proc render(reg: Registry) =
     if result == 0:
       result = cmp(p1.y, p2.y)
     if result == 0:
-      if reg.hasComponent[:WorldTileComponent](e1):
-        let tt = reg.getComponent[:WorldTileComponent](e1).tileType
-        if tt == wttMirrorBack or tt == wttMirrorFront or tt ==
-            wttMirrorLeft or tt == wttMirrorRight:
-          result = 1
+      var val = 0
+      let tt1 = reg.getComponent[:WorldTileComponent](e1).tileType
+      let tt2 = reg.getComponent[:WorldTileComponent](e2).tileType
+      if tt1 == wttMirrorBack or tt1 == wttMirrorLeft or tt1 == wttMirrorRight:
+        val = 2
+      elif tt1 == wttMirrorFront:
+        val = 0
       else:
-        result = -1
+        val = 1
+      if tt2 == wttMirrorBack or tt2 == wttMirrorLeft or tt2 == wttMirrorRight:
+        result = cmp(val, 2)
+      elif tt2 == wttMirrorFront:
+        result = cmp(val, 0)
+      else:
+        result = cmp(val, 1)
 
   DRAW_COLORS[] = spriteDrawColor
   var sprites = reg.entitiesWith(SpriteComponent, PositionComponent)
@@ -83,8 +92,9 @@ proc render(reg: Registry) =
 proc buildWorld() =
   reg = newRegistry()
   let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level01,
-      unsafeAddr level02, unsafeAddr level03, unsafeAddr level04,
-      unsafeAddr level05, unsafeAddr level06, unsafeAddr level08])
+      unsafeAddr level05, unsafeAddr level02, unsafeAddr level04,
+      unsafeAddr level02, unsafeAddr level06, unsafeAddr level07,
+      unsafeAddr level08])
   sm = newStateMachine(level)
 
 proc setPalette() =
@@ -154,3 +164,4 @@ proc update {.exportWasm.} =
     DRAW_COLORS[] = initialDrawColor
     text("Rolly Dango", 35, 10)
     text("Finished the game", 10, 30)
+    text("Thank you for playing!", 5, 50)

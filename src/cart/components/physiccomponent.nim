@@ -36,11 +36,13 @@ proc getTileAt(reg: Registry, x: int8, y: int8, z: int8): Option[Entity] =
 proc standingOn(reg: Registry, pos: PositionComponent): Option[Entity] =
     return reg.getTileAt(pos.x, pos.y, pos.z-1)
 
-proc getMirrorAt(reg: Registry, x: int8, y: int8, z: int8): Option[Entity] =
+proc getMirrorAt(reg: Registry, x: int8, y: int8, z: int8,
+        entity: Entity): Option[Entity] =
     for e in reg.entitiesWith(PositionComponent, WorldTileComponent):
         let (tpos, twtt) = reg.getComponents(e, PositionComponent, WorldTileComponent)
-        if tpos.x == x and tpos.y == y and tpos.z == z and (twtt.tileType ==
-                wttMirrorRight or twtt.tileType == wttMirrorFront or
+        if e != entity and tpos.x == x and tpos.y == y and tpos.z == z and (
+                twtt.tileType == wttMirrorRight or twtt.tileType ==
+                wttMirrorFront or
                 twtt.tileType == wttMirrorLeft or twtt.tileType ==
                 wttMirrorBack):
             return some(e)
@@ -139,8 +141,9 @@ proc processTileFriction(reg: Registry, pos: PositionComponent,
         phy: PhysicsComponent) =
     let entityUnder = reg.standingOn(pos)
     if entityUnder.isSome():
-        if reg.getComponent[:WorldTileComponent](entityUnder.get()).tileType ==
-                WorldTileType.wttTile:
+        let tileType = reg.getComponent[:WorldTileComponent](entityUnder.get()).tileType
+        if tileType == WorldTileType.wttTile or tileType ==
+                WorldTileType.wttStatic:
             let vel = tileFriction(phy)
             phy.velocity.x += vel.x
             phy.velocity.y += vel.y
@@ -156,8 +159,8 @@ proc isSlope(tileType: WorldTileType): bool =
 
 proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent, direction: Direction, tileMove: int8) =
-    let entityHere = reg.getMirrorAt(pos.x, pos.y, pos.z)
-    if entityHere.isSome() and entityHere.get() != entity:
+    let entityHere = reg.getMirrorAt(pos.x, pos.y, pos.z, entity)
+    if entityHere.isSome():
         let hereTileType = reg.getComponent[:WorldTileComponent](
                 entityHere.get()).tileType
         if hereTileType == wttMirrorRight and (direction ==
@@ -306,8 +309,8 @@ proc moveOneTile(reg: Registry, entity: Entity, pos: PositionComponent,
 
 proc processMirror(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent) =
-    let entityHere = reg.getMirrorAt(pos.x, pos.y, pos.z)
-    if entityHere.isSome() and entityHere.get() != entity:
+    let entityHere = reg.getMirrorAt(pos.x, pos.y, pos.z, entity)
+    if entityHere.isSome():
         case reg.getComponent[:WorldTileComponent](
                 entityHere.get()).tileType
         of wttMirrorRight, wttMirrorLeft:
@@ -359,21 +362,13 @@ proc processPunch(reg: Registry, direction: Direction, pos: PositionComponent,
         phy: PhysicsComponent) =
     case direction
     of dRight:
-        var newVel = transfertVelocity(phy.velocity, dRight)
-        newVel.y += PUNCH_VELOCITY_INCREASE
-        phy.velocity = newVel
+        phy.velocity = Velocity(x: 0, y: PUNCH_VELOCITY_INCREASE)
     of dFront:
-        var newVel = transfertVelocity(phy.velocity, dFront)
-        newVel.x += PUNCH_VELOCITY_INCREASE
-        phy.velocity = newVel
+        phy.velocity = Velocity(x: PUNCH_VELOCITY_INCREASE, y: 0)
     of dLeft:
-        var newVel = transfertVelocity(phy.velocity, dLeft)
-        newVel.y -= PUNCH_VELOCITY_INCREASE
-        phy.velocity = newVel
+        phy.velocity = Velocity(x: 0, y: -PUNCH_VELOCITY_INCREASE)
     of dBack:
-        var newVel = transfertVelocity(phy.velocity, dBack)
-        newVel.x -= PUNCH_VELOCITY_INCREASE
-        phy.velocity = newVel
+        phy.velocity = Velocity(x: -PUNCH_VELOCITY_INCREASE, y: 0)
     else:
         discard
 
