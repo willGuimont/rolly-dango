@@ -92,8 +92,8 @@ proc render(reg: Registry) =
 proc buildWorld() =
   reg = newRegistry()
   let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level01,
-      unsafeAddr level02, unsafeAddr level03, unsafeAddr level04,
-      unsafeAddr level05, unsafeAddr level06, unsafeAddr level07,
+      unsafeAddr level05, unsafeAddr level02, unsafeAddr level04,
+      unsafeAddr level02, unsafeAddr level06, unsafeAddr level07,
       unsafeAddr level08])
   sm = newStateMachine(level)
 
@@ -164,3 +164,4 @@ proc update {.exportWasm.} =
     DRAW_COLORS[] = initialDrawColor
     text("Rolly Dango", 35, 10)
     text("Finished the game", 10, 30)
+    text("Thank you for playing!", 5, 50)
