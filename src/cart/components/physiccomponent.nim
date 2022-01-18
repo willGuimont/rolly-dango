@@ -362,21 +362,13 @@ proc processPunch(reg: Registry, direction: Direction, pos: PositionComponent,
         phy: PhysicsComponent) =
     case direction
     of dRight:
-        var newVel = transfertVelocity(phy.velocity, dRight)
-        newVel.y += PUNCH_VELOCITY_INCREASE
-        phy.velocity = newVel
+        phy.velocity = Velocity(x: 0, y: PUNCH_VELOCITY_INCREASE)
     of dFront:
-        var newVel = transfertVelocity(phy.velocity, dFront)
-        newVel.x += PUNCH_VELOCITY_INCREASE
-        phy.velocity = newVel
+        phy.velocity = Velocity(x: PUNCH_VELOCITY_INCREASE, y: 0)
     of dLeft:
-        var newVel = transfertVelocity(phy.velocity, dLeft)
-        newVel.y -= PUNCH_VELOCITY_INCREASE
-        phy.velocity = newVel
+        phy.velocity = Velocity(x: 0, y: -PUNCH_VELOCITY_INCREASE)
     of dBack:
-        var newVel = transfertVelocity(phy.velocity, dBack)
-        newVel.x -= PUNCH_VELOCITY_INCREASE
-        phy.velocity = newVel
+        phy.velocity = Velocity(x: -PUNCH_VELOCITY_INCREASE, y: 0)
     else:
         discard
 

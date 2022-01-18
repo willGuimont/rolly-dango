@@ -60,19 +60,21 @@ proc render(reg: Registry) =
     if result == 0:
       result = cmp(p1.y, p2.y)
     if result == 0:
+      var val = 0
       let tt1 = reg.getComponent[:WorldTileComponent](e1).tileType
       let tt2 = reg.getComponent[:WorldTileComponent](e2).tileType
       if tt1 == wttMirrorBack or tt1 == wttMirrorLeft or tt1 == wttMirrorRight:
-        result = 1
-      if tt1 == wttMirrorFront:
-        result = -1
+        val = 2
+      elif tt1 == wttMirrorFront:
+        val = 0
       else:
-        if tt2 == wttMirrorBack or tt2 == wttMirrorLeft or tt2 == wttMirrorRight:
-          result = -1
-        if tt2 == wttMirrorFront:
-          result = 1
-        else:
-          result = 0
+        val = 1
+      if tt2 == wttMirrorBack or tt2 == wttMirrorLeft or tt2 == wttMirrorRight:
+        result = cmp(val, 2)
+      elif tt2 == wttMirrorFront:
+        result = cmp(val, 0)
+      else:
+        result = cmp(val, 1)
 
   DRAW_COLORS[] = spriteDrawColor
   var sprites = reg.entitiesWith(SpriteComponent, PositionComponent)
@@ -89,9 +91,10 @@ proc render(reg: Registry) =
 
 proc buildWorld() =
   reg = newRegistry()
-  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level07,
+  let level = newLevelList(addr reg, addr theGamepad, @[unsafeAddr level01,
       unsafeAddr level02, unsafeAddr level03, unsafeAddr level04,
-      unsafeAddr level05, unsafeAddr level06, unsafeAddr level08])
+      unsafeAddr level05, unsafeAddr level06, unsafeAddr level07,
+      unsafeAddr level08])
   sm = newStateMachine(level)
 
 proc setPalette() =
