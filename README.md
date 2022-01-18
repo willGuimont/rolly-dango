@@ -2,7 +2,7 @@
 
 Rolly Dango, an isometric rolling puzzle made with [WASM-4](https://wasm4.org/).
 
-[Try the game here!](https://willguimont.github.io/wasm4-game-jam-2022/).
+[Try the game here!](https://willguimont.github.io/wasm4-game-jam-2022/)
 
 ![rolly dango](assets/game.png)
 
@@ -11,7 +11,7 @@ Here's some key points of our project:
 - We made our own ECS (entity-component-systems) from scratch
 - To save cartridge space, we built our own Huffman coding algorithm
 - To help ourselves make levels, we built our own level editor using [p5.js](https://p5js.org/)
-- Made all of our sprites using [aseprite](https://www.aseprite.org/)
+- Made all of our sprites using [Aseprite](https://www.aseprite.org/)
 
 Our level editor:
 ![level editor](assets/editor.png)
