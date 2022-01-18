@@ -332,7 +332,7 @@ proc processVelocityMovement(reg: Registry, entity: Entity,
 
 proc playMoveSound() =
     tone(320 or (540 shl 16), (0 shl 24) or (12 shl 16) or (0 shl 0) or (
-            0 shl 8), 25, TONE_PULSE1)
+            0 shl 8), 25, TONE_TRIANGLE)
 
 proc processEventQueue(reg: Registry, entity: Entity, pos: PositionComponent,
         phy: PhysicsComponent) =
