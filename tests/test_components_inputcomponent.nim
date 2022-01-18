@@ -16,8 +16,9 @@ suite "inputsystem":
         var topic = newTopic[MovementMessage]()
         var queue = newEventQueue[MovementMessage]()
         queue.followTopic(topic)
+        let g = getNewGamepad(uint8(0b000010000))
         var testInputComponent: InputComponent = InputComponent(
-                gamepad: getNewGamepad(uint8(0b000010000)), physicTopic: topic)
+                gamepad: unsafeAddr g, physicTopic: topic)
 
         reg.addComponent(testEntity, testPositionComponent)
         reg.addComponent(testEntity, testInputComponent)

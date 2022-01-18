@@ -1,8 +1,8 @@
 import std/unittest
-import cart/components/inputcomponent
 import cart/components/positioncomponent
 import cart/components/physiccomponent
 import cart/components/observercomponent
+import cart/systems/observersystem
 import cart/ecs/ecs
 import cart/events/eventqueue
 

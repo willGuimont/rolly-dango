@@ -52,9 +52,7 @@ suite "ecs":
     reg.destroyEntity(entity)
 
     check not reg.isEntityValid(entity)
-    expect ValueError:
-      # also deletes the components
-      discard reg.getComponent[:TestComponent](entity)
+    check reg.getComponent[:TestComponent](entity) == nil
 
   test "can delete all entites":
     var reg = newRegistry()
