@@ -24,4 +24,4 @@ const worldData: seq[int8] = @[0b01111111'i8, 0b11101111'i8, 0b11111101'i8,
     0b11111111'i8, 0b11111111'i8, 0b11111111'i8, 0b11111111'i8, 0b11111111'i8,
     0b11111111'i8, 0b11111000'i8]
 
-makeLevel(level05)
+makeLevel(level02)
