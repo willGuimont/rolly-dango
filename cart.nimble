@@ -23,14 +23,14 @@ before dbg:
   exec "./nimformat.sh"
 
 task dbg, "Build the cartridge in debug mode":
-  exec &"nim c -o:{outFile} src/cart.nim"
+  exec &"nim c -d:nimNoQuit -o:{outFile} src/cart.nim"
 
 # Release
 before rel:
   exec "./nimformat.sh"
 
 task rel, "Build the cartridge with all optimizations":
-  exec &"nim c -d:danger -o:{outFile} src/cart.nim"
+  exec &"nim c -d:nimNoQuit -d:danger -o:{outFile} src/cart.nim"
 
 after rel:
   let exe = findExe("wasm-opt")
