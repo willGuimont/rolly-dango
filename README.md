@@ -18,20 +18,10 @@ Our level editor:
 
 ## Dependencies
 
-If you want to play from the cartridge, you'll need to install our fork ([willGuimont/wasm4](https://github.com/willGuimont/wasm4)) of wasm4. Since we used Nim, we found that we needed to add a function to the [WASM-4](https://wasm4.org/docs/getting-started/setup) runtime (`wasi_snapshot_preview1.proc_exit`), to use any of the standard library.
-
-Otherwise, we'd get `Uncaught (in promise) TypeError: import object field 'wasi_snapshot_preview1' is not an Object` errors while running the game. This is the only modification we did to the WASM-4 runtime.
-
-So to run this game from the cartridge, you'll need to install [willGuimont/wasm4](https://github.com/willGuimont/wasm4).
-
-To install it, run the following commands:
+You'll need a nightly version of Nim because we need the `-d:nimNoQuit` from this [pull request](https://github.com/nim-lang/Nim/pull/19419/files). To do so, install the latest nightly with:
 
 ```bash
-git clone https://github.com/willGuimont/wasm4
-cd wasm4/runtimes/web
-npm install && npm run build
-cd ../../cli
-npm install && npm link
+choosenim devel --latest
 ```
 
 Optionally, you can install [binaryen](https://github.com/WebAssembly/binaryen) to optimize further the binary size.
