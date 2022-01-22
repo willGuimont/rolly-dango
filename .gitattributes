@@ -1,2 +1,2 @@
-build/* linguist-vendored
+build/** linguist-vendored
 
