@@ -1,4 +1,4 @@
 /build/
 /buildTests/
 .idea/
-tags
+tags.lock
