@@ -1,6 +1,6 @@
 # Rolly Dango
 
-Rolly Dango, an isometric rolling puzzle made with [WASM-4](https://wasm4.org/).
+Rolly Dango, an isometric rolling puzzle made with [WASM-4](https://wasm4.org/) by [@samX500](https://github.com/samX500) and [@willGuimont](https://github.com/willGuimont).
 
 [Try the game here](https://willguimont.github.io/rolly-dango/) or on [itch.io](https://willguimont.itch.io/rolly-dango)!
 
